@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.SEUUSUARIO.F3Gui</id>
+
+  <name>F3 GUI</name>
+  <summary>Interface gráfica para o Fight Flash Fraud</summary>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <description>
+    <p>
+      F3 GUI é uma interface gráfica para as ferramentas de linha de comando
+      do Fight Flash Fraud (f3), que detectam e corrigem pen drives e cartões
+      de memória falsos que reportam uma capacidade maior do que realmente possuem.
+    </p>
+    <p>Funcionalidades:</p>
+    <ul>
+      <li>Detecta automaticamente dispositivos de armazenamento removíveis</li>
+      <li>Executa f3write para gravar dados de teste no dispositivo</li>
+      <li>Executa f3read para verificar a integridade dos dados gravados</li>
+      <li>Executa f3probe para sondar a capacidade real do dispositivo</li>
+      <li>Executa f3fix para corrigir a tabela de partições de dispositivos falsos</li>
+      <li>Exibe um veredito claro: dispositivo genuíno ou falso</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">io.github.SEUUSUARIO.F3Gui.desktop</launchable>
+
+  <url type="homepage">https://github.com/SEUUSUARIO/f3-gui</url>
+  <url type="bugtracker">https://github.com/SEUUSUARIO/f3-gui/issues</url>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>Janela principal com resultado de verificação</caption>
+      <image>https://raw.githubusercontent.com/SEUUSUARIO/f3-gui/main/screenshots/main.png</image>
+    </screenshot>
+  </screenshots>
+
+  <releases>
+    <release version="1.0.0" date="2026-04-11">
+      <description>
+        <p>Versão inicial.</p>
+      </description>
+    </release>
+  </releases>
+
+  <content_rating type="oars-1.1"/>
+
+  <categories>
+    <category>Utility</category>
+    <category>System</category>
+  </categories>
+
+  <keywords>
+    <keyword>flash</keyword>
+    <keyword>fraud</keyword>
+    <keyword>pendrive</keyword>
+    <keyword>usb</keyword>
+    <keyword>fake</keyword>
+    <keyword>f3</keyword>
+  </keywords>
+</component>

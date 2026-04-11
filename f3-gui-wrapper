@@ -1,0 +1,3 @@
+#!/bin/sh
+# Wrapper que garante que o Python do Flatpak execute o script da GUI
+exec python3 /app/bin/f3-gui-script "$@"

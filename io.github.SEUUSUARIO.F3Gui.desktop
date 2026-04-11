@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=F3 GUI
+Name[pt_BR]=F3 GUI
+GenericName=Verificador de Flash
+GenericName[pt_BR]=Verificador de Flash
+Comment=Detecta pen drives e cartões de memória falsos
+Comment[pt_BR]=Detecta pen drives e cartões de memória falsos
+Exec=f3-gui
+Icon=io.github.SEUUSUARIO.F3Gui
+Terminal=false
+Type=Application
+Categories=Utility;System;
+Keywords=flash;fraud;pendrive;usb;fake;f3;
+StartupNotify=true
