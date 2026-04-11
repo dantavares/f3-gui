@@ -44,10 +44,6 @@ sudo pacman -S f3
 
 # Fedora
 sudo dnf install f3
-
-# Compilar do fonte
-git clone https://github.com/AltraMayor/f3.git
-cd f3 && make && sudo make install
 ```
 
 ### Python 3 + Tkinter
