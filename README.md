@@ -7,6 +7,7 @@
 **Interface gráfica para o [Fight Flash Fraud (f3)](https://github.com/AltraMayor/f3)**
 
 Detecte e corrija pen drives e cartões de memória que mentem sobre sua capacidade real.
+Sim este aplicativo foi feito em IA, não gostou? não use!
 
 [![Licença: GPL v3](https://img.shields.io/badge/Licen%C3%A7a-GPLv3-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-green.svg)](https://python.org)
