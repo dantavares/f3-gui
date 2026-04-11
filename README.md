@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="io.github.SEUUSUARIO.F3Gui.svg" width="96" alt="F3 GUI icon"/>
+<img src="io.github.dantavares.f3-gui.svg" width="96" alt="F3 GUI icon"/>
 
 # F3 GUI
 
