@@ -1,4 +1,4 @@
-app-id: io.github.dantavares.F3Gui
+app-id: io.github.dantavares.f3-gui
 runtime: org.freedesktop.Platform
 runtime-version: '23.08'
 sdk: org.freedesktop.Sdk
@@ -39,20 +39,20 @@ modules:
     build-commands:
       - install -Dm755 f3_gui.py       /app/bin/f3-gui-script
       - install -Dm755 f3-gui-wrapper  /app/bin/f3-gui
-      - install -Dm644 io.github.dantavares.F3Gui.desktop
-            /app/share/applications/io.github.dantavares.F3Gui.desktop
-      - install -Dm644 io.github.dantavares.F3Gui.metainfo.xml
-            /app/share/metainfo/io.github.dantavares.F3Gui.metainfo.xml
-      - install -Dm644 io.github.dantavares.F3Gui.svg
-            /app/share/icons/hicolor/scalable/apps/io.github.dantavares.F3Gui.svg
+      - install -Dm644 io.github.dantavares.f3-gui.desktop
+            /app/share/applications/io.github.dantavares.f3-gui.desktop
+      - install -Dm644 io.github.dantavares.f3-gui.metainfo.xml
+            /app/share/metainfo/io.github.dantavares.f3-gui.metainfo.xml
+      - install -Dm644 io.github.dantavares.f3-gui.svg
+            /app/share/icons/hicolor/scalable/apps/io.github.dantavares.f3-gui.svg
     sources:
       - type: file
         path: f3_gui.py
       - type: file
         path: f3-gui-wrapper
       - type: file
-        path: io.github.dantavares.F3Gui.desktop
+        path: io.github.dantavares.f3-gui.desktop
       - type: file
-        path: io.github.dantavares.F3Gui.metainfo.xml
+        path: io.github.dantavares.f3-gui.metainfo.xml
       - type: file
-        path: io.github.dantavares.F3Gui.svg
+        path: io.github.dantavares.f3-gui.svg
