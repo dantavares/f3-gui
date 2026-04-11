@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.github.SEUUSUARIO.F3Gui</id>
+  <id>io.github.dantavares.f3-gui</id>
 
   <name>F3 GUI</name>
   <summary>Interface gráfica para o Fight Flash Fraud</summary>
@@ -25,15 +25,15 @@
     </ul>
   </description>
 
-  <launchable type="desktop-id">io.github.SEUUSUARIO.F3Gui.desktop</launchable>
+  <launchable type="desktop-id">io.github.dantavares.f3-gui.desktop</launchable>
 
-  <url type="homepage">https://github.com/SEUUSUARIO/f3-gui</url>
-  <url type="bugtracker">https://github.com/SEUUSUARIO/f3-gui/issues</url>
+  <url type="homepage">https://github.com/dantavares/f3-gui</url>
+  <url type="bugtracker">https://github.com/dantavares/f3-gui/issues</url>
 
   <screenshots>
     <screenshot type="default">
       <caption>Janela principal com resultado de verificação</caption>
-      <image>https://raw.githubusercontent.com/SEUUSUARIO/f3-gui/main/screenshots/main.png</image>
+      <image>https://raw.githubusercontent.com/dantavares/f3-gui/main/screenshots/main.png</image>
     </screenshot>
   </screenshots>
 
