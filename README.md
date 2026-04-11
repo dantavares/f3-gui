@@ -103,10 +103,6 @@ python3 f3_gui.py
 
 ## 📦 Instalação via Flatpak (em breve)
 
-```bash
-flatpak install flathub io.github.SEUUSUARIO.F3Gui
-```
-
 ---
 
 ## 🗂️ Estrutura do projeto
