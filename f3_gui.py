@@ -466,6 +466,21 @@ class F3App(tk.Tk):
                                       bg=BG2, fg=TEXT_DIM, font=(MONO, 8))
         self._last_sec_lbl.pack(anchor="w", pady=(2, 0))
 
+        # Label FAT32 (usado após f3fix)
+        tk.Frame(of, bg=BORDER, height=1).pack(fill="x", pady=(8, 0))
+        lf_row = tk.Frame(of, bg=BG2)
+        lf_row.pack(fill="x", pady=(6, 0))
+        tk.Label(lf_row, text="Label FAT32:", bg=BG2, fg=TEXT_DIM,
+                 font=(MONO, 9)).pack(side="left")
+        self._fat_label_var = tk.StringVar(value="PENDRIVE")
+        tk.Entry(lf_row, textvariable=self._fat_label_var,
+                 bg=BG3, fg=ACCENT, insertbackground=ACCENT,
+                 relief="flat", font=(MONO, 9, "bold"), width=12,
+                 highlightthickness=1, highlightbackground=BORDER,
+                 highlightcolor=ACCENT).pack(side="left", padx=(4, 0), ipady=3)
+        tk.Label(of, text="Usado ao formatar após f3fix",
+                 bg=BG2, fg=TEXT_DIM, font=(MONO, 8)).pack(anchor="w", pady=(2, 0))
+
         # Botões de ação
         self._section(parent, "Ações")
         bf = tk.Frame(parent, bg=BG2)
@@ -511,24 +526,6 @@ class F3App(tk.Tk):
                      wraplength=270).pack(padx=12, pady=8, anchor="w")
 
     def _build_output(self, parent):
-        # Barras de progresso
-        pf = tk.Frame(parent, bg=BG2)
-        pf.pack(fill="x", pady=(0,8))
-        tk.Label(pf, text="PROGRESSO", bg=BG2, fg=TEXT_DIM,
-                 font=(MONO, 8)).pack(anchor="w", padx=8, pady=(6,2))
-        self._prog_write = ProgressRow(pf, "Escrita")
-        self._prog_write.pack(fill="x", padx=8, pady=2)
-        self._prog_read  = ProgressRow(pf, "Leitura / Verify")
-        self._prog_read.pack(fill="x", padx=8, pady=(2,8))
-
-        # Estilo ttk para progressbar
-        style = ttk.Style()
-        style.theme_use("default")
-        style.configure("Horizontal.TProgressbar",
-                        troughcolor=BG3, background=ACCENT,
-                        bordercolor=BG3, lightcolor=ACCENT,
-                        darkcolor=ACCENT)
-
         # Terminal
         tk.Label(parent, text="SAÍDA", bg=BG, fg=TEXT_DIM,
                  font=(MONO, 8)).pack(anchor="w")
@@ -536,9 +533,8 @@ class F3App(tk.Tk):
         self._term.pack(fill="both", expand=True)
 
         # Banner de veredito (oculto até ter resultado)
-        self._verdict_frame = tk.Frame(parent, bg=BG, height=0)
-        self._verdict_frame.pack(fill="x", pady=(6, 0))
-        self._verdict_frame.pack_propagate(False)
+        self._verdict_frame = tk.Frame(parent, bg=BG)
+        # Não empacota aqui — _show_verdict faz o pack quando necessário
 
         self._verdict_icon  = tk.Label(self._verdict_frame, font=(MONO, 26),
                                        bg=BG)
@@ -596,26 +592,25 @@ class F3App(tk.Tk):
 
     def _clear(self):
         self._term.clear()
-        self._prog_write.reset()
-        self._prog_read.reset()
         self._hide_verdict()
 
     # ── Veredito ──────────────────────────────────────────────────────────────
 
     def _hide_verdict(self):
-        self._verdict_frame.config(height=0)
-        self._verdict_frame.pack_propagate(False)
+        self._verdict_frame.pack_forget()
+        # Limpa o conteúdo para não mostrar resultado antigo se reaparecer
+        self._verdict_title.config(text="")
+        self._verdict_detail.config(text="")
+        self._verdict_icon.config(text="")
 
     def _show_verdict(self, genuine, title, detail, color):
         icon = "✅" if genuine else "⚠️"
-        self._verdict_icon.config(text=icon)
-        self._verdict_title.config(text=title, fg=color)
-        self._verdict_detail.config(text=detail, fg=TEXT if genuine else WARN)
-        # Linha colorida no topo do banner
-        self._verdict_frame.config(
-            bg=color, highlightbackground=color,
-            highlightthickness=2, height=80)
-        self._verdict_icon.config(bg=BG)
+        self._verdict_icon.config(text=icon, bg=BG)
+        self._verdict_title.config(text=title, fg=color, bg=BG)
+        self._verdict_detail.config(text=detail,
+                                    fg=TEXT if genuine else WARN, bg=BG)
+        self._verdict_frame.config(bg=color, highlightbackground=color,
+                                   highlightthickness=2)
         for w in self._verdict_frame.winfo_children():
             try:
                 w.config(bg=BG)
@@ -623,7 +618,8 @@ class F3App(tk.Tk):
                     ww.config(bg=BG)
             except Exception:
                 pass
-        self._verdict_frame.pack_propagate(False)
+        # Recoloca o frame após o terminal
+        self._verdict_frame.pack(fill="x", pady=(6, 0))
 
     @staticmethod
     def _analyze_output(lines):
@@ -712,35 +708,41 @@ class F3App(tk.Tk):
     @staticmethod
     def _iter_lines(fd):
         """
-        Lê de um file descriptor de PTY caractere a caractere,
-        separando em \\n e \\r para capturar as linhas de progresso do f3.
+        Lê do PTY em chunks e separa:
+        - \\r\\n → linha normal  (sep='LF')
+        - \\r sozinho → progresso (sep='CR')
+        O PTY converte \\n do processo em \\r\\n, então linhas normais
+        chegam como \\r\\n e linhas de progresso como \\r sem \\n seguinte.
         """
         import os
-        buf = []
+        buf = ""
         while True:
             try:
-                ch = os.read(fd, 1).decode("utf-8", errors="replace")
+                chunk = os.read(fd, 512).decode("utf-8", errors="replace")
             except OSError:
-                # PTY fechou (processo terminou)
                 break
-            if not ch:
+            if not chunk:
                 break
-            if ch in ("\n", "\r"):
-                yield "".join(buf), ch
-                buf = []
-            else:
-                buf.append(ch)
+            buf += chunk
+            # Processa \r\n primeiro (linhas completas)
+            while "\r\n" in buf:
+                line, buf = buf.split("\r\n", 1)
+                yield line, "LF"
+            # Processa \r sozinhos (linhas de progresso)
+            # Guarda o último segmento no buffer (pode estar incompleto)
+            parts = buf.split("\r")
+            for part in parts[:-1]:
+                yield part, "CR"
+            buf = parts[-1]
         if buf:
-            yield "".join(buf), "\n"
+            yield buf, "LF"
 
-    def _run_cmd(self, cmd, title, prog_row=None, parse_fn=None,
-                 show_verdict=False):
+    def _run_cmd(self, cmd, title, parse_fn=None, show_verdict=False,
+                 on_success=None):
         if self._running:
             return
         self._set_running(True)
         self._hide_verdict()
-        self._prog_write.reset()
-        self._prog_read.reset()
         self._term.header(title)
         self._term.timestamp()
         self._term.write(f"  $ {' '.join(cmd)}\n\n", "blue")
@@ -748,8 +750,9 @@ class F3App(tk.Tk):
         collected = []
 
         def worker():
-            import pty, os
+            import pty, os, tty
             master_fd, slave_fd = pty.openpty()
+            tty.setraw(slave_fd)
             try:
                 self._process = subprocess.Popen(
                     cmd,
@@ -758,26 +761,15 @@ class F3App(tk.Tk):
                     stdin=slave_fd,
                     close_fds=True,
                 )
-                os.close(slave_fd)   # filho tem a cópia; fecha no pai
+                os.close(slave_fd)
 
                 for line, sep in self._iter_lines(master_fd):
-                    is_cr = (sep == "\r")
-
-                    # Atualiza barra de progresso (\\r ou \\n)
-                    if parse_fn and prog_row:
-                        pct = parse_fn(line)
-                        if pct is not None:
-                            self.after(0, lambda v=pct: prog_row.set(v))
-
-                    # Também chama parse_fn para efeitos colaterais (ex: last-sec)
+                    is_cr = (sep == "CR")
                     if parse_fn:
                         parse_fn(line)
-
                     if is_cr:
-                        # Linha de progresso: mostra no terminal em dim
-                        self.after(0, lambda l=line: (
-                            self._term.write("\r" + l, "dim")
-                        ))
+                        self.after(0, lambda l=line: self._info_lbl.config(
+                            text=l.strip()))
                     else:
                         collected.append(line)
                         self._handle_line(line + "\n", None, None)
@@ -788,6 +780,8 @@ class F3App(tk.Tk):
                 if rc == 0:
                     self.after(0, lambda: self._term.write(
                         "\n✔ Concluído com sucesso.\n", "success"))
+                    if on_success:
+                        self.after(0, on_success)
                 else:
                     self.after(0, lambda: self._term.write(
                         f"\n✘ Processo encerrado (código {rc}).\n", "error"))
@@ -807,7 +801,7 @@ class F3App(tk.Tk):
 
         threading.Thread(target=worker, daemon=True).start()
 
-    def _handle_line(self, line, prog_row, parse_fn):
+    def _handle_line(self, line, *_):
         tag = ""
         l = line.lower()
         if any(w in l for w in ("error", "erro", "failed", "falha")):
@@ -816,38 +810,35 @@ class F3App(tk.Tk):
             tag = "success"
         elif any(w in l for w in ("warn", "aviso", "caution")):
             tag = "warn"
-
         self.after(0, lambda ln=line, t=tag: self._term.write(ln, t))
-
-        if parse_fn and prog_row:
-            pct = parse_fn(line)
-            if pct is not None:
-                self.after(0, lambda v=pct: prog_row.set(v))
 
     # ── Parsers de progresso ──────────────────────────────────────────────────
 
     @staticmethod
     def _parse_write(line):
-        m = re.search(r'\((\d+(?:\.\d+)?)%\)', line)
+        # f3write: "Creating file 1.h2w ...  6.07% -- 3.35 MB/s -- 10:35"
+        m = re.search(r'(\d+(?:\.\d+)?)\s*%', line)
         if m:
             return float(m.group(1))
         return None
 
     @staticmethod
     def _parse_read(line):
-        m = re.search(r'\((\d+(?:\.\d+)?)%\)', line)
+        # f3read: mesmo formato
+        m = re.search(r'(\d+(?:\.\d+)?)\s*%', line)
         if m:
             return float(m.group(1))
         return None
 
     def _parse_probe_line(self, line):
-        """Extrai --last-sec=N da saída do f3probe e atualiza o campo."""
-        # f3probe sugere o comando:  f3fix --last-sec=29675000 /dev/sdb
         m = re.search(r'--last-sec[= ](\d+)', line)
         if m:
             val = m.group(1)
             self.after(0, lambda v=val: self._set_last_sec(v))
-        return self._parse_read(line)
+        m2 = re.search(r'(\d+(?:\.\d+)?)\s*%', line)
+        if m2:
+            return float(m2.group(1))
+        return None
 
     def _set_last_sec(self, val):
         self._last_sec_var.set(val)
@@ -868,8 +859,7 @@ class F3App(tk.Tk):
                                        f"'{mount}' não existe. Continuar mesmo assim?"):
                 return
         self._run_cmd(["f3write", mount],
-                      "f3write — Gravando dados de teste",
-                      self._prog_write, self._parse_write)
+                      "f3write — Gravando dados de teste")
 
     def _run_read(self):
         mount = self._mount_var.get().strip()
@@ -878,7 +868,6 @@ class F3App(tk.Tk):
             return
         self._run_cmd(["f3read", mount],
                       "f3read — Verificando integridade",
-                      self._prog_read, self._parse_read,
                       show_verdict=True)
 
     def _run_probe(self):
@@ -892,12 +881,11 @@ class F3App(tk.Tk):
             "Tem certeza que deseja continuar?"
         ):
             return
-        # Limpa o last-sec anterior antes de rodar
         self._last_sec_var.set("")
         self._last_sec_lbl.config(text="Rode f3probe primeiro ⮭", fg=TEXT_DIM)
         cmd = self._privileged_cmd(["f3probe", "--destructive", device])
         self._run_cmd(cmd, f"f3probe — Sondando {device}",
-                      self._prog_read, self._parse_probe_line,
+                      parse_fn=self._parse_probe_line,
                       show_verdict=True)
 
     def _run_fix(self):
@@ -917,18 +905,89 @@ class F3App(tk.Tk):
             messagebox.showerror("Valor inválido",
                                  f"--last-sec deve ser um número inteiro.\nValor atual: '{last_sec}'")
             return
+        label = self._fat_label_var.get().strip().upper() or "PENDRIVE"
+        # Limita a 11 chars (limite FAT32) e remove chars inválidos
+        label = re.sub(r'[^A-Z0-9_\- ]', '', label)[:11]
+
         if not messagebox.askyesno(
-            "Confirmar f3fix",
-            f"f3fix irá MODIFICAR a tabela de partições de {device}.\n"
-            f"  --last-sec = {last_sec}\n\n"
-            "Esta operação é irreversível. Continuar?"
+            "Confirmar f3fix + Formatar",
+            f"Sequência completa para {device}:\n\n"
+            f"  1. f3fix  --last-sec={last_sec}\n"
+            f"  2. mkfs.fat -F 32  (label: {label})\n"
+            f"  3. Montar automaticamente\n\n"
+            "Os dados existentes serão APAGADOS. Continuar?"
         ):
             return
+
+        # Detecta a primeira partição do dispositivo (ex: /dev/sdb → /dev/sdb1)
+        # f3fix recria a tabela de partições com uma partição sdb1
+        part = self._first_partition(device)
+
         cmd = self._privileged_cmd(["f3fix", f"--last-sec={last_sec}", device])
         self._run_cmd(
             cmd,
-            f"f3fix — Corrigindo {device}  (--last-sec={last_sec})"
+            f"f3fix — Corrigindo {device}  (--last-sec={last_sec})",
+            on_success=lambda: self._do_format(part, label)
         )
+
+    @staticmethod
+    def _first_partition(device):
+        """
+        Deriva a primeira partição a partir do dispositivo.
+        /dev/sdb  → /dev/sdb1
+        /dev/mmcblk0 → /dev/mmcblk0p1
+        """
+        import re as _re
+        if _re.search(r'\d$', device):
+            # Dispositivo já termina em dígito (ex: mmcblk0) → adiciona 'p1'
+            return device + "p1"
+        return device + "1"
+
+    def _do_format(self, partition, label):
+        """Formata a partição como FAT32 e em seguida monta."""
+        self._term.write(f"\n  Aguardando o kernel reconhecer {partition}…\n", "dim")
+
+        def after_settle():
+            # Pequena pausa para o kernel atualizar /dev após f3fix
+            import time
+            time.sleep(2)
+            self.after(0, lambda: self._run_mkfs(partition, label))
+
+        threading.Thread(target=after_settle, daemon=True).start()
+
+    def _run_mkfs(self, partition, label):
+        """Executa mkfs.fat -F 32 na partição."""
+        cmd = self._privileged_cmd(
+            ["mkfs.fat", "-F", "32", "-n", label, partition]
+        )
+        self._run_cmd(
+            cmd,
+            f"mkfs.fat — Formatando {partition} como FAT32  (label: {label})",
+            on_success=lambda: self._do_mount(partition)
+        )
+
+    def _do_mount(self, partition):
+        """Monta a partição via udisksctl (sem root) ou mount (com root)."""
+        # udisksctl é preferível: não precisa de root e cria o mountpoint
+        if shutil.which("udisksctl"):
+            cmd = ["udisksctl", "mount", "-b", partition]
+            title = f"udisksctl — Montando {partition}"
+        else:
+            # Fallback: cria /media/f3gui e monta com pkexec
+            mount_pt = f"/media/f3gui"
+            os.makedirs(mount_pt, exist_ok=True)
+            cmd = self._privileged_cmd(["mount", partition, mount_pt])
+            title = f"mount — Montando {partition} em {mount_pt}"
+
+        self._run_cmd(cmd, title,
+                      on_success=lambda: self._after_mount(partition))
+
+    def _after_mount(self, partition):
+        """Atualiza o terminal e o dropdown de montagem após montar com sucesso."""
+        self._term.write(
+            f"\n✔ {partition} montado com sucesso.\n", "success")
+        # Atualiza a lista de dispositivos para refletir o novo ponto de montagem
+        self._refresh_devices()
 
     @staticmethod
     def _privileged_cmd(cmd):

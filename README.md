@@ -19,17 +19,6 @@ Detecte e corrija pen drives e cartões de memória que mentem sobre sua capacid
 
 ---
 
-## 😠 O "Problema"
-Fabricantes pilantras de memória flash, como pendrives, cartões sd e até SSD, crian produtos que "mentem" sua capacidade real. Normalmente são falsos e se passam por marcas famosas como SanDisk, Samsung, Western Digital etc. Estes dispositivos falsos se parecem fisicamente ao oringial, mas informam ao dispositivo host (pc, celular, câmera) uma capacidade de armazenamento que na verdade não comportam, normalmente uma fração da capacidade. Isso faz que num primeiro uso ele se comporte normalmente, mas quando ele excede sua capacidade real, grava os dados no "limbo", você acha que o arquivo foi gravado, mas ao ler da erro, e neste ponto provavelmente o cartão não tem garantia mais, e provavelmente você até já deu uma qualificação positiva ao vendedor. Por isso quase nunca da pra confiar apenas em validações positivas de outros usuários, pois provavelmente eles cairam neste "modus operandi".
-Como evitar cair neste golpe?
-
-- Se possível só compre cartões SD e Pendrives em lojas confiáveis e com nota fiscal.
-- Desconfie de preços absurdamente baixos, provavelmente ele é falso e enganoso.
-- Teste IMEDIATAMENTE o dispositivo, assim que tirar a embalagem. E é ai que este programa entra...
-
-Caso confirme ser um dispositivo falso, e seja impossível devolver, ainda é possível usa-lo, sem ter o risco de perder dados, identificando a sua "real", e refazendo a partição primária com este valor, assim o dispositivo pode até informar um tamanho a mais que ele realmente comporta, mas você limita ele a usar o tamanho correto.
-
-
 ## ✨ Funcionalidades
 
 - **Detecção automática** de dispositivos de armazenamento removíveis (pendrives, cartões SD)
@@ -41,10 +30,6 @@ Caso confirme ser um dispositivo falso, e seja impossível devolver, ainda é po
 - Painel de controles **rolável** — funciona em qualquer resolução de tela
 
 ---
-
-## 🐛 Bug Conhecido
-* As Barras de "Escrita" e "Leitura" não estão funcionando
-* As saídas (stdout) não aparecem em tempo real e as vezes com caracteres estranhos
 
 ## 🛠️ Pré-requisitos
 
@@ -59,9 +44,6 @@ sudo pacman -S f3
 
 # Fedora
 sudo dnf install f3
-
-# Windows
-Senta no colo do Bill Gates e chora
 ```
 
 ### Python 3 + Tkinter
@@ -107,7 +89,6 @@ python3 f3_gui.py
    └─ Execute f3probe  →  detecta capacidade real e captura --last-sec
    └─ Execute f3fix    →  corrige a tabela de partições
 ```
-`Se você estiver com pressa, pode ir direto pra o passo 6`
 
 ### O que cada ferramenta faz
 
@@ -121,6 +102,35 @@ python3 f3_gui.py
 ---
 
 ## 📦 Instalação via Flatpak (em breve)
+
+---
+
+## 🗂️ Estrutura do projeto
+
+```
+f3-gui/
+├── f3_gui.py                              # Aplicação principal
+├── io.github.SEUUSUARIO.F3Gui.yml        # Manifesto Flatpak
+├── io.github.SEUUSUARIO.F3Gui.metainfo.xml
+├── io.github.SEUUSUARIO.F3Gui.desktop
+├── io.github.SEUUSUARIO.F3Gui.svg        # Ícone
+├── f3-gui-wrapper                         # Script wrapper (Flatpak)
+├── screenshots/
+│   └── main.png
+└── README.md
+```
+
+---
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas! Sinta-se à vontade para abrir uma _issue_ ou enviar um _pull request_.
+
+1. Faça um fork do projeto
+2. Crie sua branch: `git checkout -b minha-feature`
+3. Faça commit das alterações: `git commit -m 'Adiciona minha feature'`
+4. Envie para o GitHub: `git push origin minha-feature`
+5. Abra um Pull Request
 
 ---
 
