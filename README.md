@@ -1,10 +1,10 @@
 <div align="center">
 
-<img src="io.github.dantavares.f3-gui.svg" width="96" alt="F3 GUI icon"/>
+<img src="io.github.dantavares.f3-gui.svg" width="96" alt="F3 GUI icon"/> <BR>
 
-Detecte e corrija pen drives e cartões de memória que mentem sobre sua capacidade real.
+<P> Detecte e corrija pen drives e cartões de memória que mentem sobre sua capacidade real </P>
 
-<img src="screenshots/main.png" alt="Screenshot" />
+<br> <img src="screenshots/main.png" alt="Screenshot" />
 
 </div>
 
