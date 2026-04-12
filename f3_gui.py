@@ -512,22 +512,22 @@ class F3App(tk.Tk):
 
     def _build_output(self, parent):
         # Barras de progresso
-        #pf = tk.Frame(parent, bg=BG2)
-        #pf.pack(fill="x", pady=(0,8))
-        #tk.Label(pf, text="PROGRESSO", bg=BG2, fg=TEXT_DIM,
-        #         font=(MONO, 8)).pack(anchor="w", padx=8, pady=(6,2))
-        #self._prog_write = ProgressRow(pf, "Escrita")
-        #self._prog_write.pack(fill="x", padx=8, pady=2)
-        #self._prog_read  = ProgressRow(pf, "Leitura")
-        #self._prog_read.pack(fill="x", padx=8, pady=(2,8))
+        pf = tk.Frame(parent, bg=BG2)
+        pf.pack(fill="x", pady=(0,8))
+        tk.Label(pf, text="PROGRESSO", bg=BG2, fg=TEXT_DIM,
+                 font=(MONO, 8)).pack(anchor="w", padx=8, pady=(6,2))
+        self._prog_write = ProgressRow(pf, "Escrita")
+        self._prog_write.pack(fill="x", padx=8, pady=2)
+        self._prog_read  = ProgressRow(pf, "Leitura / Verify")
+        self._prog_read.pack(fill="x", padx=8, pady=(2,8))
 
         # Estilo ttk para progressbar
-        #style = ttk.Style()
-        #style.theme_use("default")
-        #style.configure("Horizontal.TProgressbar",
-        #                troughcolor=BG3, background=ACCENT,
-        #                bordercolor=BG3, lightcolor=ACCENT,
-        #                darkcolor=ACCENT)
+        style = ttk.Style()
+        style.theme_use("default")
+        style.configure("Horizontal.TProgressbar",
+                        troughcolor=BG3, background=ACCENT,
+                        bordercolor=BG3, lightcolor=ACCENT,
+                        darkcolor=ACCENT)
 
         # Terminal
         tk.Label(parent, text="SAÍDA", bg=BG, fg=TEXT_DIM,
@@ -709,6 +709,30 @@ class F3App(tk.Tk):
 
     # ── Execução de comandos ──────────────────────────────────────────────────
 
+    @staticmethod
+    def _iter_lines(fd):
+        """
+        Lê de um file descriptor de PTY caractere a caractere,
+        separando em \\n e \\r para capturar as linhas de progresso do f3.
+        """
+        import os
+        buf = []
+        while True:
+            try:
+                ch = os.read(fd, 1).decode("utf-8", errors="replace")
+            except OSError:
+                # PTY fechou (processo terminou)
+                break
+            if not ch:
+                break
+            if ch in ("\n", "\r"):
+                yield "".join(buf), ch
+                buf = []
+            else:
+                buf.append(ch)
+        if buf:
+            yield "".join(buf), "\n"
+
     def _run_cmd(self, cmd, title, prog_row=None, parse_fn=None,
                  show_verdict=False):
         if self._running:
@@ -724,17 +748,41 @@ class F3App(tk.Tk):
         collected = []
 
         def worker():
+            import pty, os
+            master_fd, slave_fd = pty.openpty()
             try:
                 self._process = subprocess.Popen(
                     cmd,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    text=True,
-                    bufsize=1
+                    stdout=slave_fd,
+                    stderr=slave_fd,
+                    stdin=slave_fd,
+                    close_fds=True,
                 )
-                for line in self._process.stdout:
-                    collected.append(line)
-                    self._handle_line(line, prog_row, parse_fn)
+                os.close(slave_fd)   # filho tem a cópia; fecha no pai
+
+                for line, sep in self._iter_lines(master_fd):
+                    is_cr = (sep == "\r")
+
+                    # Atualiza barra de progresso (\\r ou \\n)
+                    if parse_fn and prog_row:
+                        pct = parse_fn(line)
+                        if pct is not None:
+                            self.after(0, lambda v=pct: prog_row.set(v))
+
+                    # Também chama parse_fn para efeitos colaterais (ex: last-sec)
+                    if parse_fn:
+                        parse_fn(line)
+
+                    if is_cr:
+                        # Linha de progresso: mostra no terminal em dim
+                        self.after(0, lambda l=line: (
+                            self._term.write("\r" + l, "dim")
+                        ))
+                    else:
+                        collected.append(line)
+                        self._handle_line(line + "\n", None, None)
+
+                os.close(master_fd)
                 self._process.wait()
                 rc = self._process.returncode
                 if rc == 0:
