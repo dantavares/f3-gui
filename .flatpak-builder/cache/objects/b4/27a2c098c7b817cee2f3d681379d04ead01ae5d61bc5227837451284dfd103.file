@@ -1,0 +1,6 @@
+#!/bin/sh
+export TCL_LIBRARY=/app/lib/tcl8.6
+export TK_LIBRARY=/app/lib/tk8.6
+export LD_LIBRARY_PATH=/app/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+export PYTHONPATH=/app/lib/python3.11${PYTHONPATH:+:$PYTHONPATH}
+exec python3 /app/bin/f3-gui-script "$@"

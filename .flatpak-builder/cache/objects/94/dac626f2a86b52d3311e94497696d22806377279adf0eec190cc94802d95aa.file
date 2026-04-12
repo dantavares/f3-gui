@@ -1,0 +1,5 @@
+[Runtime]
+name=io.github.dantavares.f3_gui.Locale
+
+[ExtensionOf]
+ref=app/io.github.dantavares.f3-gui/x86_64/master

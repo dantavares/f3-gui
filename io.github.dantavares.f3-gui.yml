@@ -1,0 +1,141 @@
+app-id: io.github.dantavares.f3-gui
+runtime: org.freedesktop.Platform
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
+
+command: f3-gui
+
+finish-args:
+  - --device=all
+  - --filesystem=home
+  - --socket=x11
+  #- --socket=wayland
+  - --share=ipc
+  # Necessário para flatpak-spawn --host (executa pkexec fora do sandbox)
+  - --talk-name=org.freedesktop.Flatpak
+  - --system-talk-name=org.freedesktop.PolicyKit1
+
+modules:
+
+  # ── 1. Tcl 8.6 ────────────────────────────────────────────────────────────
+  - name: tcl
+    buildsystem: autotools
+    subdir: unix
+    build-options:
+      no-debuginfo: true
+    config-opts:
+      - --enable-shared
+      - --prefix=/app
+    sources:
+      - type: archive
+        url: https://prdownloads.sourceforge.net/tcl/tcl8.6.13-src.tar.gz
+        sha256: 43a1fae7412f61ff11de2cfd05d28cfc3a73762f354a417c62370a54e2caf066
+
+  # ── 2. Tk 8.6 ─────────────────────────────────────────────────────────────
+  - name: tk
+    buildsystem: autotools
+    subdir: unix
+    build-options:
+      no-debuginfo: true
+    config-opts:
+      - --enable-shared
+      - --prefix=/app
+      - --with-tcl=/app/lib
+    sources:
+      - type: archive
+        url: https://prdownloads.sourceforge.net/tcl/tk8.6.13-src.tar.gz
+        sha256: 2e65fa069a23365440a3c56c556b8673b5e32a283800d8d9b257e3f584ce0675
+
+  # ── 3. _tkinter.so + pacote tkinter/ ──────────────────────────────────────
+  - name: python3-tkinter
+    buildsystem: simple
+    build-commands:
+      - |
+        PYINC=$(python3 -c "import sysconfig; print(sysconfig.get_path('include'))")
+        PYLIB=$(python3 -c "import sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
+        PYVER=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+        SOABI=$(python3 -c "import sysconfig; print(sysconfig.get_config_var('SOABI'))")
+
+        echo "=== build info: PYINC=${PYINC} PYVER=${PYVER} SOABI=${SOABI} ==="
+
+        gcc -shared -fPIC -O2 \
+          -I"${PYINC}" \
+          -I/app/include \
+          Modules/_tkinter.c \
+          -L"${PYLIB}" -lpython${PYVER} \
+          -L/app/lib -ltcl8.6 -ltk8.6 \
+          -Wl,-rpath,/app/lib \
+          -o _tkinter.${SOABI}.so
+
+        install -d /app/lib/python${PYVER}
+        install -m755 _tkinter.${SOABI}.so \
+          /app/lib/python${PYVER}/_tkinter.${SOABI}.so
+        echo "Instalado: /app/lib/python${PYVER}/_tkinter.${SOABI}.so"
+
+        cp -r Lib/tkinter /app/lib/python${PYVER}/tkinter
+        echo "Instalado: /app/lib/python${PYVER}/tkinter/"
+    sources:
+      - type: archive
+        url: https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tar.xz
+        sha256: 9b1e896523fc510691126c864406d9360a3d1e986acbda59cda57b5abda45b87
+
+  # ── 4. Parted ─────────────────────────────────────────────────────────────
+  - name: parted
+    buildsystem: autotools
+    config-opts:
+      - --disable-device-mapper
+      - --disable-readline
+    sources:
+      - type: archive
+        url: https://ftp.gnu.org/gnu/parted/parted-3.6.tar.xz
+        sha256: 3b43dbe33cca0f9a18601ebab56b7852b128ec1a3df3a9b30ccde5e73359e612
+
+  # ── 5. f3 ─────────────────────────────────────────────────────────────────
+  - name: f3
+    buildsystem: simple
+    build-options:
+      env:
+        PKG_CONFIG_PATH: /app/lib/pkgconfig
+    build-commands:
+      - make
+      - make install PREFIX=/app
+      - make install-extra PREFIX=/app
+    sources:
+      - type: git
+        url: https://github.com/AltraMayor/f3.git
+        tag: v8.0
+        commit: 4dae4eaf008d80ef01c4e42c80f297885de6fdd7
+
+  # ── 6. Aplicação principal ─────────────────────────────────────────────────
+  - name: f3-gui
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 f3_gui.py  /app/bin/f3-gui-script
+      - install -Dm755 f3-gui     /app/bin/f3-gui
+      - install -Dm644 io.github.dantavares.f3-gui.desktop
+            /app/share/applications/io.github.dantavares.f3-gui.desktop
+      - install -Dm644 io.github.dantavares.f3-gui.metainfo.xml
+            /app/share/metainfo/io.github.dantavares.f3-gui.metainfo.xml
+      - install -Dm644 io.github.dantavares.f3-gui.svg
+            /app/share/icons/hicolor/scalable/apps/io.github.dantavares.f3-gui.svg
+      - install -Dm644 io.github.dantavares.f3-gui.policy
+            /app/share/polkit-1/actions/io.github.dantavares.f3-gui.policy
+    sources:
+      - type: file
+        path: f3_gui.py
+      - type: script
+        dest-filename: f3-gui
+        commands:
+          - export TCL_LIBRARY=/app/lib/tcl8.6
+          - export TK_LIBRARY=/app/lib/tk8.6
+          - export LD_LIBRARY_PATH=/app/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+          - export PYTHONPATH=/app/lib/python3.11${PYTHONPATH:+:$PYTHONPATH}
+          - exec python3 /app/bin/f3-gui-script "$@"
+      - type: file
+        path: io.github.dantavares.f3-gui.desktop
+      - type: file
+        path: io.github.dantavares.f3-gui.metainfo.xml
+      - type: file
+        path: io.github.dantavares.f3-gui.svg
+      - type: file
+        path: io.github.dantavares.f3-gui.policy
