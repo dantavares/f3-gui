@@ -59,6 +59,9 @@ sudo pacman -S f3
 
 # Fedora
 sudo dnf install f3
+
+# Windows
+Senta no colo do Bill Gates e chora
 ```
 
 ### Python 3 + Tkinter
