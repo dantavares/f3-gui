@@ -107,6 +107,7 @@ python3 f3_gui.py
    └─ Execute f3probe  →  detecta capacidade real e captura --last-sec
    └─ Execute f3fix    →  corrige a tabela de partições
 ```
+`Se você estiver com pressa, pode ir direto pra o passo 6`
 
 ### O que cada ferramenta faz
 
