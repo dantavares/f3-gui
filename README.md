@@ -95,7 +95,7 @@ python3 f3_gui.py
 ## 📦 Instalação via Flatpak
 
 Por causa do acesso direto ao dispositivo (via /dev) necessário para o funcionamento f3probe e f3fix, a plataforma flathub não aceita meu pacote,
-por questões de segurança. Por enquanto, para usar via flatpak, instale via o arquivo <a href="https://dantavares.github.io/f3-gui/f3-gui.flatpakref"f3-gui.flatpakref</a> 
+por questões de segurança. Por enquanto, para usar via flatpak, instale via o arquivo <a href="https://dantavares.github.io/f3-gui/f3-gui.flatpakref"> f3-gui.flatpakref </a>
 
 ---
 
