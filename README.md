@@ -31,6 +31,10 @@ Detecte e corrija pen drives e cartões de memória que mentem sobre sua capacid
 
 ---
 
+## 🐛 Bug Conhecido
+* As Barras de "Escrita" e "Leitura" não estão funcionando
+* As saídas (stdout) não aparecem em tempo real e as vezes com caracteres estranhos
+
 ## 🛠️ Pré-requisitos
 
 ### f3 (Fight Flash Fraud)
