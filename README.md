@@ -106,19 +106,19 @@ Por causa do acesso direto ao dispositivo (via /dev) necessário para o funciona
 por questões de segurança. Por enquanto, para usar via flatpak, é necessário compilar e instalar localmente.
 
 1. Primeiramente instale o pacote flatpak-builder
-- Debian / Ubuntu: apt install flatpak-builder
+`Debian / Ubuntu: apt install flatpak-builder`
 
 2. Clone este repositório (de preferênica no seu home)
-- git clone https://github.com/dantavares/f3-gui.git
+`git clone https://github.com/dantavares/f3-gui.git`
 
 3. Dentro do diretório clonado, compile o projeto
-- flatpak-builder build-dir io.github.dantavares.f3-gui.yml
+`flatpak-builder build-dir io.github.dantavares.f3-gui.yml`
 
 4. Instale o aplicativo
-- flatpak-builder --install --user --force-clean build-dir io.github.dantavares.f3-gui.yml
+`flatpak-builder --install --user --force-clean build-dir io.github.dantavares.f3-gui.yml`
 
 Após instalado, o aplicativo deve aparecer nos seus programas, ou rode ele manualmente:
-- flatpak run io.github.dantavares.f3-gui
+`flatpak run io.github.dantavares.f3-gui`
 
 ---
 
