@@ -11,7 +11,9 @@ finish-args:
   - --socket=x11
   - --socket=wayland
   - --share=ipc
+  # Necessário para flatpak-spawn --host (executa pkexec fora do sandbox)
   - --talk-name=org.freedesktop.Flatpak
+  - --system-talk-name=org.freedesktop.PolicyKit1
 
 modules:
 
@@ -45,9 +47,6 @@ modules:
         sha256: 2e65fa069a23365440a3c56c556b8673b5e32a283800d8d9b257e3f584ce0675
 
   # ── 3. _tkinter.so + pacote tkinter/ ──────────────────────────────────────
-  # Instala ambos em /app/lib/python3.11/ que será adicionado ao PYTHONPATH
-  # pelo wrapper f3-gui. Não usamos lib-dynload pois esse diretório é do
-  # runtime (somente leitura em /usr) e não é buscado via PYTHONPATH.
   - name: python3-tkinter
     buildsystem: simple
     build-commands:
@@ -59,7 +58,6 @@ modules:
 
         echo "=== build info: PYINC=${PYINC} PYVER=${PYVER} SOABI=${SOABI} ==="
 
-        # Compila _tkinter.so
         gcc -shared -fPIC -O2 \
           -I"${PYINC}" \
           -I/app/include \
@@ -69,14 +67,11 @@ modules:
           -Wl,-rpath,/app/lib \
           -o _tkinter.${SOABI}.so
 
-        # Instala _tkinter.so diretamente em /app/lib/python3.11/
-        # (não em lib-dynload) para ser encontrado via PYTHONPATH
         install -d /app/lib/python${PYVER}
         install -m755 _tkinter.${SOABI}.so \
           /app/lib/python${PYVER}/_tkinter.${SOABI}.so
         echo "Instalado: /app/lib/python${PYVER}/_tkinter.${SOABI}.so"
 
-        # Copia o pacote tkinter/ do fonte CPython para o mesmo diretório
         cp -r Lib/tkinter /app/lib/python${PYVER}/tkinter
         echo "Instalado: /app/lib/python${PYVER}/tkinter/"
     sources:
@@ -84,19 +79,34 @@ modules:
         url: https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tar.xz
         sha256: 9b1e896523fc510691126c864406d9360a3d1e986acbda59cda57b5abda45b87
 
-  # ── 4. f3 ─────────────────────────────────────────────────────────────────
+  # ── 4. Parted ─────────────────────────────────────────────────────────────
+  - name: parted
+    buildsystem: autotools
+    config-opts:
+      - --disable-device-mapper
+      - --disable-readline
+    sources:
+      - type: archive
+        url: https://ftp.gnu.org/gnu/parted/parted-3.6.tar.xz
+        sha256: 3b43dbe33cca0f9a18601ebab56b7852b128ec1a3df3a9b30ccde5e73359e612
+
+  # ── 5. f3 ─────────────────────────────────────────────────────────────────
   - name: f3
     buildsystem: simple
+    build-options:
+      env:
+        PKG_CONFIG_PATH: /app/lib/pkgconfig
     build-commands:
       - make
       - make install PREFIX=/app
+      - make install-extra PREFIX=/app
     sources:
       - type: git
         url: https://github.com/AltraMayor/f3.git
-        tag: v8.0
-        commit: 4dae4eaf008d80ef01c4e42c80f297885de6fdd7
+        #tag: v8.0
+        #commit: COLOQUE_O_COMMIT_HASH_AQUI
 
-  # ── 5. Aplicação principal ─────────────────────────────────────────────────
+  # ── 6. Aplicação principal ─────────────────────────────────────────────────
   - name: f3-gui
     buildsystem: simple
     build-commands:
@@ -108,6 +118,8 @@ modules:
             /app/share/metainfo/io.github.dantavares.f3-gui.metainfo.xml
       - install -Dm644 io.github.dantavares.f3-gui.svg
             /app/share/icons/hicolor/scalable/apps/io.github.dantavares.f3-gui.svg
+      - install -Dm644 io.github.dantavares.f3-gui.policy
+            /app/share/polkit-1/actions/io.github.dantavares.f3-gui.policy
     sources:
       - type: file
         path: f3_gui.py
@@ -125,3 +137,5 @@ modules:
         path: io.github.dantavares.f3-gui.metainfo.xml
       - type: file
         path: io.github.dantavares.f3-gui.svg
+      - type: file
+        path: io.github.dantavares.f3-gui.policy

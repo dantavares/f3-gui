@@ -512,22 +512,22 @@ class F3App(tk.Tk):
 
     def _build_output(self, parent):
         # Barras de progresso
-        pf = tk.Frame(parent, bg=BG2)
-        pf.pack(fill="x", pady=(0,8))
-        tk.Label(pf, text="PROGRESSO", bg=BG2, fg=TEXT_DIM,
-                 font=(MONO, 8)).pack(anchor="w", padx=8, pady=(6,2))
-        self._prog_write = ProgressRow(pf, "Escrita")
-        self._prog_write.pack(fill="x", padx=8, pady=2)
-        self._prog_read  = ProgressRow(pf, "Leitura / Verify")
-        self._prog_read.pack(fill="x", padx=8, pady=(2,8))
+        #pf = tk.Frame(parent, bg=BG2)
+        #pf.pack(fill="x", pady=(0,8))
+        #tk.Label(pf, text="PROGRESSO", bg=BG2, fg=TEXT_DIM,
+        #         font=(MONO, 8)).pack(anchor="w", padx=8, pady=(6,2))
+        #self._prog_write = ProgressRow(pf, "Escrita")
+        #self._prog_write.pack(fill="x", padx=8, pady=2)
+        #self._prog_read  = ProgressRow(pf, "Leitura")
+        #self._prog_read.pack(fill="x", padx=8, pady=(2,8))
 
         # Estilo ttk para progressbar
-        style = ttk.Style()
-        style.theme_use("default")
-        style.configure("Horizontal.TProgressbar",
-                        troughcolor=BG3, background=ACCENT,
-                        bordercolor=BG3, lightcolor=ACCENT,
-                        darkcolor=ACCENT)
+        #style = ttk.Style()
+        #style.theme_use("default")
+        #style.configure("Horizontal.TProgressbar",
+        #                troughcolor=BG3, background=ACCENT,
+        #                bordercolor=BG3, lightcolor=ACCENT,
+        #                darkcolor=ACCENT)
 
         # Terminal
         tk.Label(parent, text="SAÍDA", bg=BG, fg=TEXT_DIM,
@@ -838,7 +838,6 @@ class F3App(tk.Tk):
         if not device:
             messagebox.showwarning("Atenção", "Selecione ou informe o dispositivo.")
             return
-        cmd = ["f3probe", "--destructive", device]
         if not messagebox.askyesno(
             "Confirmar f3probe",
             f"f3probe irá APAGAR DADOS em {device}.\n"
@@ -848,6 +847,7 @@ class F3App(tk.Tk):
         # Limpa o last-sec anterior antes de rodar
         self._last_sec_var.set("")
         self._last_sec_lbl.config(text="Rode f3probe primeiro ⮭", fg=TEXT_DIM)
+        cmd = self._privileged_cmd(["f3probe", "--destructive", device])
         self._run_cmd(cmd, f"f3probe — Sondando {device}",
                       self._prog_read, self._parse_probe_line,
                       show_verdict=True)
@@ -876,10 +876,32 @@ class F3App(tk.Tk):
             "Esta operação é irreversível. Continuar?"
         ):
             return
+        cmd = self._privileged_cmd(["f3fix", f"--last-sec={last_sec}", device])
         self._run_cmd(
-            ["f3fix", f"--last-sec={last_sec}", device],
+            cmd,
             f"f3fix — Corrigindo {device}  (--last-sec={last_sec})"
         )
+
+    @staticmethod
+    def _privileged_cmd(cmd):
+        """
+        Dentro do Flatpak: usa flatpak-spawn --host para sair do sandbox
+        e chamar pkexec no sistema host, onde o agente polkit está rodando.
+        Fora do Flatpak: tenta pkexec direto, depois sudo como fallback.
+        """
+        # Detecta se está rodando dentro de um Flatpak
+        if os.path.exists("/.flatpak-info"):
+            spawn = shutil.which("flatpak-spawn")
+            if spawn:
+                return [spawn, "--host", "pkexec"] + cmd
+        # Fora do Flatpak
+        pkexec = shutil.which("pkexec")
+        if pkexec:
+            return [pkexec] + cmd
+        sudo = shutil.which("sudo")
+        if sudo:
+            return [sudo] + cmd
+        return cmd
 
 
 # ─── Entry point ──────────────────────────────────────────────────────────────
