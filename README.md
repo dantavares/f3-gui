@@ -2,16 +2,7 @@
 
 <img src="io.github.dantavares.f3-gui.svg" width="96" alt="F3 GUI icon"/>
 
-# F3 GUI
-
-Interface gráfica para o [Fight Flash Fraud (f3)](https://github.com/AltraMayor/f3) 
-
 Detecte e corrija pen drives e cartões de memória que mentem sobre sua capacidade real.
-
-[![Licença: GPL v3](https://img.shields.io/badge/Licen%C3%A7a-GPLv3-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.8%2B-green.svg)](https://python.org)
-[![Plataforma](https://img.shields.io/badge/Plataforma-Linux-orange.svg)]()
-[![Flathub](https://img.shields.io/badge/Flathub-em%20breve-blueviolet.svg)]()
 
 <img src="screenshots/main.png" alt="Screenshot" />
 
