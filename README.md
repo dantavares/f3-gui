@@ -93,23 +93,9 @@ python3 f3_gui.py
 ---
 
 ## 📦 Instalação via Flatpak
+
 Por causa do acesso direto ao dispositivo (via /dev) necessário para o funcionamento f3probe e f3fix, a plataforma flathub não aceita meu pacote,
-por questões de segurança. Por enquanto, para usar via flatpak, é necessário compilar e instalar localmente.
-
-1. Primeiramente instale o pacote flatpak-builder <br>
-`Debian / Ubuntu: apt install flatpak-builder`
-
-2. Clone este repositório (de preferênica no seu home) <br>
-`git clone https://github.com/dantavares/f3-gui.git`
-
-3. Dentro do diretório clonado, compile o projeto <br>
-`flatpak-builder build-dir io.github.dantavares.f3-gui.yml`
-
-4. Instale o aplicativo <br>
-`flatpak-builder --install --user --force-clean build-dir io.github.dantavares.f3-gui.yml`
-
-Após instalado, o aplicativo deve aparecer nos seus programas, ou rode ele manualmente: <br>
-`flatpak run io.github.dantavares.f3-gui`
+por questões de segurança. Por enquanto, para usar via flatpak, instale via o arquivo <a href="https://dantavares.github.io/f3-gui/f3-gui.flatpakref"> f3-gui.flatpakref </a>
 
 ---
 
