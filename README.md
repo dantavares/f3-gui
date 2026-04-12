@@ -30,7 +30,7 @@ Por causa do acesso direto ao dispositivo (via /dev) necessário para o funciona
 por questões de segurança. Por enquanto, para usar via flatpak, instale via o arquivo <a href="https://dantavares.github.io/f3-gui/f3-gui.flatpakref"> f3-gui.flatpakref </a>
 
 
-> **Atenção:** `f3probe` e `f3fix` precisam de privilégios de root para acessar o dispositivo diretamente. Execute com `sudo python3 f3_gui.py` caso necessário, ou configure o `polkit` para permitir acesso sem senha.
+> **Atenção:** `f3probe` e `f3fix` precisam de privilégios de root para acessar o dispositivo diretamente, por isso ele pedirá senha do usuário ao usar estas funções.
 
 ---
 
