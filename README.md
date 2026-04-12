@@ -105,35 +105,6 @@ python3 f3_gui.py
 
 ---
 
-## 🗂️ Estrutura do projeto
-
-```
-f3-gui/
-├── f3_gui.py                              # Aplicação principal
-├── io.github.SEUUSUARIO.F3Gui.yml        # Manifesto Flatpak
-├── io.github.SEUUSUARIO.F3Gui.metainfo.xml
-├── io.github.SEUUSUARIO.F3Gui.desktop
-├── io.github.SEUUSUARIO.F3Gui.svg        # Ícone
-├── f3-gui-wrapper                         # Script wrapper (Flatpak)
-├── screenshots/
-│   └── main.png
-└── README.md
-```
-
----
-
-## 🤝 Contribuindo
-
-Contribuições são bem-vindas! Sinta-se à vontade para abrir uma _issue_ ou enviar um _pull request_.
-
-1. Faça um fork do projeto
-2. Crie sua branch: `git checkout -b minha-feature`
-3. Faça commit das alterações: `git commit -m 'Adiciona minha feature'`
-4. Envie para o GitHub: `git push origin minha-feature`
-5. Abra um Pull Request
-
----
-
 ## 📄 Licença
 
 Distribuído sob a licença **GPL-3.0**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
