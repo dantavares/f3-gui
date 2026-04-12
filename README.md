@@ -22,46 +22,13 @@
 
 ---
 
-## 🛠️ Pré-requisitos
-
-### f3 (Fight Flash Fraud)
-
-```bash
-# Debian / Ubuntu / Linux Mint
-sudo apt install f3
-
-# Arch Linux
-sudo pacman -S f3
-
-# Fedora
-sudo dnf install f3
-```
-
-### Python 3 + Tkinter
-
-```bash
-# Debian / Ubuntu
-sudo apt install python3 python3-tk
-
-# Arch Linux
-sudo pacman -S python tk
-
-# Fedora
-sudo dnf install python3 python3-tkinter
-```
-
----
-
 ## 🚀 Como usar
 
-```bash
-# Clone o repositório
-git clone https://github.com/SEUUSUARIO/f3-gui.git
-cd f3-gui
+### 📦 Instale via Flatpak
 
-# Execute
-python3 f3_gui.py
-```
+Por causa do acesso direto ao dispositivo (via /dev) necessário para o funcionamento f3probe e f3fix, a plataforma flathub não aceita meu pacote,
+por questões de segurança. Por enquanto, para usar via flatpak, instale via o arquivo <a href="https://dantavares.github.io/f3-gui/f3-gui.flatpakref"> f3-gui.flatpakref </a>
+
 
 > **Atenção:** `f3probe` e `f3fix` precisam de privilégios de root para acessar o dispositivo diretamente. Execute com `sudo python3 f3_gui.py` caso necessário, ou configure o `polkit` para permitir acesso sem senha.
 
@@ -89,13 +56,6 @@ python3 f3_gui.py
 | `f3read`  | Lê os arquivos e verifica integridade — dá o veredito final | Não |
 | `f3probe` | Sonda a capacidade real sem precisar encher o dispositivo | **Sim** |
 | `f3fix`   | Corrige a tabela de partições para refletir o tamanho real | **Sim** |
-
----
-
-## 📦 Instalação via Flatpak
-
-Por causa do acesso direto ao dispositivo (via /dev) necessário para o funcionamento f3probe e f3fix, a plataforma flathub não aceita meu pacote,
-por questões de segurança. Por enquanto, para usar via flatpak, instale via o arquivo <a href="https://dantavares.github.io/f3-gui/f3-gui.flatpakref"> f3-gui.flatpakref </a>
 
 ---
 
