@@ -101,7 +101,15 @@ python3 f3_gui.py
 
 ---
 
-## 📦 Instalação via Flatpak (em breve)
+## 📦 Instalação via Flatpak
+Por causa do acesso direto ao dispositivo (via /dev) necessário para o funcionamento f3probe e f3fix, a plataforma flathub não aceita meu pacote,
+por questões de segurança. Por enquanto, para usar via flatpak, é necessário compilar e instalar localmente.
+
+1. Primeiramente instale o pacote flatpak-builder
+- Debian / Ubuntu: 'apt install flatpak-builder'
+
+2. Clone este repositório
+- 'git clone '
 
 ---
 
