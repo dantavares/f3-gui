@@ -4,7 +4,7 @@
 
 # F3 GUI
 
-**Interface gráfica para o [Fight Flash Fraud (f3)](https://github.com/AltraMayor/f3)**
+Interface gráfica para o [Fight Flash Fraud (f3)](https://github.com/AltraMayor/f3) 
 
 Detecte e corrija pen drives e cartões de memória que mentem sobre sua capacidade real.
 
@@ -13,7 +13,7 @@ Detecte e corrija pen drives e cartões de memória que mentem sobre sua capacid
 [![Plataforma](https://img.shields.io/badge/Plataforma-Linux-orange.svg)]()
 [![Flathub](https://img.shields.io/badge/Flathub-em%20breve-blueviolet.svg)]()
 
-![Screenshot da aplicação](screenshots/main.png)
+<img src="screenshots/main.png" alt="Screenshot" />
 
 </div>
 
