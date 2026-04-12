@@ -1,0 +1,154 @@
+{
+  "id" : "io.github.dantavares.f3-gui",
+  "runtime" : "org.freedesktop.Platform",
+  "runtime-version" : "23.08",
+  "runtime-commit" : "065c61a337f78034498ad18e2707dacb6852823b150488b9f5c95e1548f70ab5",
+  "sdk" : "org.freedesktop.Sdk",
+  "sdk-commit" : "f7bd662b000ec1a857b81d8fc158295493cc79b7286bae2c99ee357ab7ef17db",
+  "command" : "f3-gui",
+  "modules" : [
+    {
+      "name" : "tcl",
+      "subdir" : "unix",
+      "buildsystem" : "autotools",
+      "config-opts" : [
+        "--enable-shared",
+        "--prefix=/app"
+      ],
+      "sources" : [
+        {
+          "url" : "https://prdownloads.sourceforge.net/tcl/tcl8.6.13-src.tar.gz",
+          "sha256" : "43a1fae7412f61ff11de2cfd05d28cfc3a73762f354a417c62370a54e2caf066",
+          "type" : "archive"
+        }
+      ],
+      "build-options" : {
+        "no-debuginfo" : true
+      }
+    },
+    {
+      "name" : "tk",
+      "subdir" : "unix",
+      "buildsystem" : "autotools",
+      "config-opts" : [
+        "--enable-shared",
+        "--prefix=/app",
+        "--with-tcl=/app/lib"
+      ],
+      "sources" : [
+        {
+          "url" : "https://prdownloads.sourceforge.net/tcl/tk8.6.13-src.tar.gz",
+          "sha256" : "2e65fa069a23365440a3c56c556b8673b5e32a283800d8d9b257e3f584ce0675",
+          "type" : "archive"
+        }
+      ],
+      "build-options" : {
+        "no-debuginfo" : true
+      }
+    },
+    {
+      "name" : "python3-tkinter",
+      "buildsystem" : "simple",
+      "sources" : [
+        {
+          "url" : "https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tar.xz",
+          "sha256" : "9b1e896523fc510691126c864406d9360a3d1e986acbda59cda57b5abda45b87",
+          "type" : "archive"
+        }
+      ],
+      "build-commands" : [
+        "PYINC=$(python3 -c \"import sysconfig; print(sysconfig.get_path('include'))\")\nPYLIB=$(python3 -c \"import sysconfig; print(sysconfig.get_config_var('LIBDIR'))\")\nPYVER=$(python3 -c \"import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')\")\nSOABI=$(python3 -c \"import sysconfig; print(sysconfig.get_config_var('SOABI'))\")\n\necho \"=== build info: PYINC=${PYINC} PYVER=${PYVER} SOABI=${SOABI} ===\"\n\ngcc -shared -fPIC -O2 \\\n  -I\"${PYINC}\" \\\n  -I/app/include \\\n  Modules/_tkinter.c \\\n  -L\"${PYLIB}\" -lpython${PYVER} \\\n  -L/app/lib -ltcl8.6 -ltk8.6 \\\n  -Wl,-rpath,/app/lib \\\n  -o _tkinter.${SOABI}.so\n\ninstall -d /app/lib/python${PYVER}\ninstall -m755 _tkinter.${SOABI}.so \\\n  /app/lib/python${PYVER}/_tkinter.${SOABI}.so\necho \"Instalado: /app/lib/python${PYVER}/_tkinter.${SOABI}.so\"\n\ncp -r Lib/tkinter /app/lib/python${PYVER}/tkinter\necho \"Instalado: /app/lib/python${PYVER}/tkinter/\"\n"
+      ]
+    },
+    {
+      "name" : "parted",
+      "buildsystem" : "autotools",
+      "config-opts" : [
+        "--disable-device-mapper",
+        "--disable-readline"
+      ],
+      "sources" : [
+        {
+          "url" : "https://ftp.gnu.org/gnu/parted/parted-3.6.tar.xz",
+          "sha256" : "3b43dbe33cca0f9a18601ebab56b7852b128ec1a3df3a9b30ccde5e73359e612",
+          "type" : "archive"
+        }
+      ]
+    },
+    {
+      "name" : "f3",
+      "buildsystem" : "simple",
+      "sources" : [
+        {
+          "url" : "https://github.com/AltraMayor/f3.git",
+          "commit" : "4dae4eaf008d80ef01c4e42c80f297885de6fdd7",
+          "type" : "git"
+        }
+      ],
+      "build-options" : {
+        "env" : {
+          "PKG_CONFIG_PATH" : "/app/lib/pkgconfig"
+        }
+      },
+      "build-commands" : [
+        "make",
+        "make install PREFIX=/app",
+        "make install-extra PREFIX=/app"
+      ]
+    },
+    {
+      "name" : "f3-gui",
+      "buildsystem" : "simple",
+      "sources" : [
+        {
+          "path" : "f3_gui.py",
+          "type" : "file"
+        },
+        {
+          "commands" : [
+            "export TCL_LIBRARY=/app/lib/tcl8.6",
+            "export TK_LIBRARY=/app/lib/tk8.6",
+            "export LD_LIBRARY_PATH=/app/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}",
+            "export PYTHONPATH=/app/lib/python3.11${PYTHONPATH:+:$PYTHONPATH}",
+            "exec python3 /app/bin/f3-gui-script \"$@\""
+          ],
+          "dest-filename" : "f3-gui",
+          "type" : "script"
+        },
+        {
+          "path" : "io.github.dantavares.f3-gui.desktop",
+          "type" : "file"
+        },
+        {
+          "path" : "io.github.dantavares.f3-gui.metainfo.xml",
+          "type" : "file"
+        },
+        {
+          "path" : "io.github.dantavares.f3-gui.svg",
+          "type" : "file"
+        },
+        {
+          "path" : "io.github.dantavares.f3-gui.policy",
+          "type" : "file"
+        }
+      ],
+      "build-commands" : [
+        "install -Dm755 f3_gui.py  /app/bin/f3-gui-script",
+        "install -Dm755 f3-gui     /app/bin/f3-gui",
+        "install -Dm644 io.github.dantavares.f3-gui.desktop /app/share/applications/io.github.dantavares.f3-gui.desktop",
+        "install -Dm644 io.github.dantavares.f3-gui.metainfo.xml /app/share/metainfo/io.github.dantavares.f3-gui.metainfo.xml",
+        "install -Dm644 io.github.dantavares.f3-gui.svg /app/share/icons/hicolor/scalable/apps/io.github.dantavares.f3-gui.svg",
+        "install -Dm644 io.github.dantavares.f3-gui.policy /app/share/polkit-1/actions/io.github.dantavares.f3-gui.policy"
+      ]
+    }
+  ],
+  "finish-args" : [
+    "--device=all",
+    "--filesystem=home",
+    "--socket=x11",
+    "--share=ipc",
+    "--talk-name=org.freedesktop.Flatpak",
+    "--system-talk-name=org.freedesktop.PolicyKit1"
+  ],
+  "source-date-epoch" : 1776017764
+}
