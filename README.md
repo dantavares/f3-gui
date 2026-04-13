@@ -22,8 +22,12 @@
 
 ---
 
-## 🚀 Usage
+### 📜 Source Code
+- Github: [dantavares.github.io/f3-gui](https://dantavares.github.io/f3-gui)
 
+---
+
+## 🚀 Usage
 ### 📦 Install using Flatpak
 
 Due to required raw device access (`/dev`), this app is **not accepted on Flathub**. 
