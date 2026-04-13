@@ -26,7 +26,6 @@ Detect and repair USB drives and memory cards that falsely report their actual c
 - **Clear final verdict**: ✅ genuine device or ⛔ fake capacity
 - **Automatic extraction** of `--last-sec` from f3probe for direct use in f3fix
 - **Built-in terminal** with real-time output and color-coded logs
-- **Progress bars** for write and read operations
 - **Responsive, scrollable UI** — works on any screen size
 
 ---
