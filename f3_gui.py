@@ -940,17 +940,21 @@ class F3App(tk.Tk):
         Write a temporary shell script with the given commands and wrap it
         in a single pkexec/sudo call — so the user authenticates only once
         for the entire sequence.
+
+        Uses /var/tmp (not /tmp) because inside Flatpak the sandbox has its
+        own private /tmp that the host-side pkexec cannot see.
         """
         import tempfile, stat
         script_body = "#!/bin/sh\nset -e\n" + "\n".join(commands) + "\n"
         tmp = tempfile.NamedTemporaryFile(
-            mode='w', suffix='.sh', delete=False, prefix='f3gui_')
+            mode='w', suffix='.sh', delete=False, prefix='f3gui_',
+            dir='/tmp')
         tmp.write(script_body)
         tmp.flush()
         tmp.close()
         os.chmod(tmp.name, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP |
                             stat.S_IROTH | stat.S_IXOTH)
-        # Clean up the temp file after a delay (process will have started by then)
+
         def _cleanup():
             import time
             time.sleep(30)

@@ -8,6 +8,7 @@ command: f3-gui
 finish-args:
   - --device=all
   - --filesystem=home
+  - --filesystem=/tmp
   - --socket=x11
   - --share=ipc
   - --talk-name=org.freedesktop.Flatpak
