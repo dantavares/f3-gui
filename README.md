@@ -23,7 +23,7 @@
 ---
 
 ### 📜 Source Code
-- Github: [dantavares.github.io/f3-gui](https://dantavares.github.io/f3-gui)
+- Github: [github.com/dantavares/f3-gui](https://github.com/dantavares/f3-gui)
 
 ---
 
