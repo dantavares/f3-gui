@@ -106,6 +106,7 @@ If the device is fake:
 Due to required raw device access (`/dev`), this app is **not accepted on Flathub**. 
 For now, to use via flatpak, install via the file [f3-gui.flatpakref](https://dantavares.github.io/f3-gui/f3-gui.flatpakref)
 
+
 ---
 
 ## 🗂️ Project structure
