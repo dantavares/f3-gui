@@ -29,6 +29,7 @@
 Due to required raw device access (`/dev`), this app is **not accepted on Flathub**. 
 For now, install via the file <a href="https://dantavares.github.io/f3-gui/f3-gui.flatpakref"> f3-gui.flatpakref </a>
 
+By installing the flatpak package, you won't need anything else, as everything is already included in it.
 
 > **Note:** `f3probe` and `f3fix` require root privileges for direct device access.
 > It will ask for the user's password when this action is necessary.
