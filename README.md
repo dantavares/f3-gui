@@ -4,34 +4,34 @@
 
 # F3 GUI
 
-**Interface gráfica para o [Fight Flash Fraud (f3)](https://github.com/AltraMayor/f3)**
+**A modern graphical interface for [Fight Flash Fraud (f3)](https://github.com/AltraMayor/f3)**
 
-Detecte e corrija pen drives e cartões de memória que mentem sobre sua capacidade real.
+Detect and repair USB drives and memory cards that falsely report their actual capacity.
 
-[![Licença: GPL v3](https://img.shields.io/badge/Licen%C3%A7a-GPLv3-blue.svg)](LICENSE)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-green.svg)](https://python.org)
-[![Plataforma](https://img.shields.io/badge/Plataforma-Linux-orange.svg)]()
-[![Flathub](https://img.shields.io/badge/Flathub-em%20breve-blueviolet.svg)]()
+[![Platform](https://img.shields.io/badge/Platform-Linux-orange.svg)]()
+[![Flathub](https://img.shields.io/badge/Flathub-unavailable-lightgrey.svg)]()
 
-![Screenshot da aplicação](screenshots/main.png)
+![Application screenshot](screenshots/main.png)
 
 </div>
 
 ---
 
-## ✨ Funcionalidades
+## ✨ Features
 
-- **Detecção automática** de dispositivos de armazenamento removíveis (pendrives, cartões SD)
-- **Sincronização** automática entre dispositivo e ponto de montagem
-- **Veredito claro** ao final da verificação: ✅ dispositivo genuíno ou ⛔ tamanho falso
-- **Captura automática** do parâmetro `--last-sec` do f3probe para uso direto no f3fix
-- **Terminal integrado** com saída em tempo real e coloração por tipo de mensagem
-- **Barras de progresso** para escrita e leitura
-- Painel de controles **rolável** — funciona em qualquer resolução de tela
+- **Automatic detection** of removable storage devices (USB drives, SD cards)
+- **Smart device ↔ mount point synchronization**
+- **Clear final verdict**: ✅ genuine device or ⛔ fake capacity
+- **Automatic extraction** of `--last-sec` from f3probe for direct use in f3fix
+- **Built-in terminal** with real-time output and color-coded logs
+- **Progress bars** for write and read operations
+- **Responsive, scrollable UI** — works on any screen size
 
 ---
 
-## 🛠️ Pré-requisitos
+## 🛠️ Requirements
 
 ### f3 (Fight Flash Fraud)
 
@@ -61,77 +61,63 @@ sudo dnf install python3 python3-tkinter
 
 ---
 
-## 🚀 Como usar
+## 🚀 Usage
 
 ```bash
-# Clone o repositório
-git clone https://github.com/SEUUSUARIO/f3-gui.git
+git clone https://github.com/dantavares/f3-gui.git
 cd f3-gui
-
-# Execute
 python3 f3_gui.py
 ```
 
-> **Atenção:** `f3probe` e `f3fix` precisam de privilégios de root para acessar o dispositivo diretamente. Execute com `sudo python3 f3_gui.py` caso necessário, ou configure o `polkit` para permitir acesso sem senha.
+> **Note:** `f3probe` and `f3fix` require root privileges for direct device access.  
+> Run with `sudo` if needed, or configure `polkit` for passwordless execution.
 
 ---
 
-## 📋 Fluxo de trabalho recomendado
+## 📋 Recommended workflow
 
 ```
-1. Conecte o dispositivo suspeito
-2. Clique em  ↺ Atualizar lista  para detectá-lo
-3. Selecione o dispositivo no dropdown
-4. Execute f3write  →  grava arquivos de teste
-5. Execute f3read   →  verifica a integridade
-                        (veredito aparece automaticamente)
-6. Se falso:
-   └─ Execute f3probe  →  detecta capacidade real e captura --last-sec
-   └─ Execute f3fix    →  corrige a tabela de partições
+1. Plug in the suspicious device
+2. Click ↺ Refresh list
+3. Select the device
+4. Run f3write  → writes test data
+5. Run f3read   → verifies integrity (verdict shown automatically)
+
+If the device is fake:
+   └─ Run f3probe → detects real capacity
+   └─ Run f3fix   → fixes partition table
 ```
 
-### O que cada ferramenta faz
+---
 
-| Ferramenta | O que faz | Precisa de root? |
-|-----------|-----------|:---:|
-| `f3write` | Grava arquivos numerados até encher o dispositivo | Não |
-| `f3read`  | Lê os arquivos e verifica integridade — dá o veredito final | Não |
-| `f3probe` | Sonda a capacidade real sem precisar encher o dispositivo | **Sim** |
-| `f3fix`   | Corrige a tabela de partições para refletir o tamanho real | **Sim** |
+## 🔍 Tool overview
+
+| Tool      | Description | Root required |
+|-----------|------------|:---:|
+| `f3write` | Fills device with test files | No |
+| `f3read`  | Verifies written data | No |
+| `f3probe` | Detects real capacity without full write | Yes |
+| `f3fix`   | Fixes partition table to match real size | Yes |
 
 ---
 
-## 📦 Instalação via Flatpak
-Por causa do acesso direto ao dispositivo (via /dev) necessário para o funcionamento f3probe e f3fix, a plataforma flathub não aceita meu pacote,
-por questões de segurança. Por enquanto, para usar via flatpak, é necessário compilar e instalar localmente.
+## 📦 Flatpak
 
-1. Primeiramente instale o pacote flatpak-builder <br>
-`Debian / Ubuntu: apt install flatpak-builder`
-
-2. Clone este repositório (de preferênica no seu home) <br>
-`git clone https://github.com/dantavares/f3-gui.git`
-
-3. Dentro do diretório clonado, compile o projeto <br>
-`flatpak-builder build-dir io.github.dantavares.f3-gui.yml`
-
-4. Instale o aplicativo <br>
-`flatpak-builder --install --user --force-clean build-dir io.github.dantavares.f3-gui.yml`
-
-Após instalado, o aplicativo deve aparecer nos seus programas, ou rode ele manualmente: <br>
-`flatpak run io.github.dantavares.f3-gui`
+Due to required raw device access (`/dev`), this app is **not accepted on Flathub**. 
+For now, to use via flatpak, install via the file [f3-gui.flatpakref](https://dantavares.github.io/f3-gui/f3-gui.flatpakref)
 
 ---
 
-## 🗂️ Estrutura do projeto
+## 🗂️ Project structure
 
 ```
 f3-gui/
-├── f3_gui.py                              # Aplicação principal
-├── io.github.SEUUSUARIO.F3Gui.yml        # Manifesto Flatpak
-├── io.github.SEUUSUARIO.F3Gui.metainfo.xml
-├── io.github.SEUUSUARIO.F3Gui.desktop
-├── io.github.SEUUSUARIO.F3Gui.svg        # Ícone
-├── f3-gui-wrapper                         # Script wrapper (Flatpak)
+├── f3_gui.py
+├── io.github.dantavares.f3-gui.yml
+├── io.github.dantavares.f3-gui.metainfo.xml
+├── io.github.dantavares.f3-gui.desktop
+├── io.github.dantavares.f3-gui.svg
+├── f3-gui-wrapper
 ├── screenshots/
 │   └── main.png
 └── README.md
@@ -139,25 +125,23 @@ f3-gui/
 
 ---
 
-## 🤝 Contribuindo
+## 🤝 Contributing
 
-Contribuições são bem-vindas! Sinta-se à vontade para abrir uma _issue_ ou enviar um _pull request_.
+Contributions are welcome.
 
-1. Faça um fork do projeto
-2. Crie sua branch: `git checkout -b minha-feature`
-3. Faça commit das alterações: `git commit -m 'Adiciona minha feature'`
-4. Envie para o GitHub: `git push origin minha-feature`
-5. Abra um Pull Request
+- Open an issue for bugs or ideas
+- Submit pull requests with clear descriptions
+- Keep commits clean and focused
 
 ---
 
-## 📄 Licença
+## 📄 License
 
-Distribuído sob a licença **GPL-3.0**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Licensed under **GPL-3.0**. See [LICENSE](LICENSE).
 
 ---
 
-## 🙏 Créditos
+## 🙏 Credits
 
-- [Michel Machado](https://github.com/AltraMayor/f3) — criador do f3 (Fight Flash Fraud)
-- Interface gráfica desenvolvida com Python e Tkinter
+- f3 by Michel Machado  
+- GUI built with Python + Tkinter
