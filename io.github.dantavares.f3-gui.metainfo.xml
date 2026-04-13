@@ -3,25 +3,25 @@
   <id>io.github.dantavares.f3-gui</id>
 
   <name>F3 GUI</name>
-  <summary>Interface gráfica para o Fight Flash Fraud</summary>
+  <summary>Graphical interface for Fight Flash Fraud</summary>
 
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
 
   <description>
     <p>
-      F3 GUI é uma interface gráfica para as ferramentas de linha de comando
-      do Fight Flash Fraud (f3), que detectam e corrigem pen drives e cartões
-      de memória falsos que reportam uma capacidade maior do que realmente possuem.
+      F3 GUI is a graphical interface for the Fight Flash Fraud (f3) 
+      command-line tools, which detect and correct fake USB drives and memory
+      cards that report a larger capacity than they actually have.
     </p>
-    <p>Funcionalidades:</p>
+    <p>Features:</p>
     <ul>
-      <li>Detecta automaticamente dispositivos de armazenamento removíveis</li>
-      <li>Executa f3write para gravar dados de teste no dispositivo</li>
-      <li>Executa f3read para verificar a integridade dos dados gravados</li>
-      <li>Executa f3probe para sondar a capacidade real do dispositivo</li>
-      <li>Executa f3fix para corrigir a tabela de partições de dispositivos falsos</li>
-      <li>Exibe um veredito claro: dispositivo genuíno ou falso</li>
+      <li>Automatically detects removable storage devices</li>
+      <li>Execute f3write to write test data to the device</li>
+      <li>EExecute f3read to verify the integrity of the recorded data</li>
+      <li>Run f3probe to probe the actual capabilities of the device</li>
+      <li>Run f3fix to fix the partition table of fake devices</li>
+      <li>It delivers a clear verdict: genuine or fake device</li>
     </ul>
   </description>
 
@@ -32,15 +32,15 @@
 
   <screenshots>
     <screenshot type="default">
-      <caption>Janela principal com resultado de verificação</caption>
+      <caption>Main window</caption>
       <image>https://raw.githubusercontent.com/dantavares/f3-gui/main/screenshots/main.png</image>
     </screenshot>
   </screenshots>
 
   <releases>
-    <release version="1.0.0" date="2026-04-11">
+    <release version="1.10.0" date="2026-04-13">
       <description>
-        <p>Versão inicial.</p>
+        <p>Stable Version</p>
       </description>
     </release>
   </releases>

@@ -1,9 +1,9 @@
 [Desktop Entry]
 Name=F3 GUI
 Name[pt_BR]=F3 GUI
-GenericName=Verificador de Flash
+GenericName=Fight Flash Fraud
 GenericName[pt_BR]=Verificador de Flash
-Comment=Detecta pen drives e cartões de memória falsos
+Comment=Detects counterfeit USB drives and memory cards.
 Comment[pt_BR]=Detecta pen drives e cartões de memória falsos
 Exec=f3-gui
 Icon=io.github.dantavares.f3-gui

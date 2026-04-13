@@ -5,9 +5,9 @@
 
 <policyconfig>
 
-  <action id="io.github.SEUUSUARIO.F3Gui.probe">
-    <description>Sondar dispositivo de armazenamento</description>
-    <message>Autenticação necessária para sondar o dispositivo com f3probe</message>
+  <action id="io.github.dantavares.f3-gui.probe">
+    <description>Probe storage device</description>
+    <message>Authentication is required to probe the device with f3probe</message>
     <icon_name>drive-removable-media</icon_name>
     <defaults>
       <allow_any>auth_admin</allow_any>
@@ -18,9 +18,9 @@
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
   </action>
 
-  <action id="io.github.SEUUSUARIO.F3Gui.fix">
-    <description>Corrigir tabela de partições do dispositivo</description>
-    <message>Autenticação necessária para corrigir o dispositivo com f3fix</message>
+  <action id="io.github.dantavares.f3-gui.fix">
+    <description>Correct device partition table</description>
+    <message>Authentication is required to fix the device with f3fix</message>
     <icon_name>drive-removable-media</icon_name>
     <defaults>
       <allow_any>auth_admin</allow_any>

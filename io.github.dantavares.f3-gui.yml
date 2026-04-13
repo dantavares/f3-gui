@@ -9,9 +9,7 @@ finish-args:
   - --device=all
   - --filesystem=home
   - --socket=x11
-  #- --socket=wayland
   - --share=ipc
-  # Necessário para flatpak-spawn --host (executa pkexec fora do sandbox)
   - --talk-name=org.freedesktop.Flatpak
   - --system-talk-name=org.freedesktop.PolicyKit1
 
