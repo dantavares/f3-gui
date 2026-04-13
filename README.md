@@ -4,7 +4,7 @@
 
 <P> A modern graphical interface for Fight Flash Fraud </P>
 
-<br> <img src="screenshots/main.png" alt="Screenshot" />
+<br> <img src="screenshot.png" alt="Screenshot" />
 
 </div>
 
