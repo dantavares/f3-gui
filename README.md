@@ -145,5 +145,5 @@ Licensed under **GPL-3.0**. See [LICENSE](LICENSE).
 
 ## 🙏 Credits
 
-- f3 by Michel Machado  
+- f3 by [Michel Machado](https://github.com/AltraMayor)
 - GUI built with Python + Tkinter
