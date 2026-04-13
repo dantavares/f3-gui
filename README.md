@@ -144,5 +144,5 @@ Licensed under **GPL-3.0**. See [LICENSE](LICENSE).
 
 ## 🙏 Credits
 
-- f3 tools by [Michel Machado](https://github.com/AltraMayor) 
+- f3 by Michel Machado  
 - GUI built with Python + Tkinter

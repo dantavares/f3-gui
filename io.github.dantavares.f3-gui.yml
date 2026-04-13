@@ -8,6 +8,7 @@ command: f3-gui
 finish-args:
   - --device=all
   - --filesystem=host
+  - --filesystem=/tmp
   - --socket=x11
   - --share=ipc
   - --talk-name=org.freedesktop.Flatpak
@@ -101,8 +102,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/AltraMayor/f3.git
-        tag: v8.0
-        commit: 4dae4eaf008d80ef01c4e42c80f297885de6fdd7
+        tag: v9.0
+        commit: 8439d3a5f4abf1b057986be8876922b5d58474ed
 
   # ── 6. Aplicação principal ─────────────────────────────────────────────────
   - name: f3-gui
