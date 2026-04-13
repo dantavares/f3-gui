@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 F3 - Fight Flash Fraud
-Interface gráfica para as ferramentas f3write, f3read e f3probe
+Graphical interface for f3write, f3read and f3probe tools
 """
 
 import tkinter as tk
@@ -14,7 +14,7 @@ import re
 from datetime import datetime
 
 
-# ─── Paleta de cores ──────────────────────────────────────────────────────────
+# ─── Color palette ──────────────────────────────────────────────────────────
 BG        = "#0e1117"
 BG2       = "#161b25"
 BG3       = "#1e2535"
@@ -34,12 +34,12 @@ def hex_to_rgb(h):
     return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
 
 
-# ─── Widgets personalizados ───────────────────────────────────────────────────
+# ─── Custom widgets ───────────────────────────────────────────────────
 
 class FlatButton(tk.Button):
     def __init__(self, parent, text, command=None, color=ACCENT,
                  text_color=BG, width=160, height=38, font_size=11, **kwargs):
-        # Calcula largura em caracteres aproximada (tkinter usa chars, não px)
+        # Approximate character width (tkinter uses chars, not px)
         char_w = max(1, width // (font_size * 8 // 10 + 2))
         super().__init__(
             parent,
@@ -122,7 +122,7 @@ class LabeledEntry(tk.Frame):
 
 
 class Terminal(tk.Frame):
-    """Área de saída estilo terminal."""
+    """Terminal-style output area."""
     def __init__(self, parent, **kwargs):
         super().__init__(parent, bg=BG, **kwargs)
         self.text = tk.Text(self, bg="#080c12", fg=TEXT, font=(MONO, 9),
@@ -140,7 +140,7 @@ class Terminal(tk.Frame):
         sb_x.pack(side="bottom", fill="x")
         self.text.pack(fill="both", expand=True)
 
-        # Tags de cor
+        # Color tags
         self.text.tag_config("accent",  foreground=ACCENT)
         self.text.tag_config("success", foreground=SUCCESS)
         self.text.tag_config("warn",    foreground=WARN)
@@ -173,27 +173,8 @@ class Terminal(tk.Frame):
         self.write(f"  [{now}]\n", "dim")
 
 
-class ProgressRow(tk.Frame):
-    def __init__(self, parent, label, **kwargs):
-        super().__init__(parent, bg=BG2, **kwargs)
-        tk.Label(self, text=label, bg=BG2, fg=TEXT_DIM,
-                 font=(MONO, 9), width=18, anchor="w").pack(side="left")
-        self.bar = ttk.Progressbar(self, mode="determinate", length=320)
-        self.bar.pack(side="left", padx=(6,8))
-        self.pct = tk.Label(self, text="  0%", bg=BG2, fg=ACCENT,
-                            font=(MONO, 9, "bold"), width=6)
-        self.pct.pack(side="left")
 
-    def set(self, value):
-        v = max(0, min(100, value))
-        self.bar["value"] = v
-        self.pct.config(text=f"{v:4.1f}%")
-
-    def reset(self):
-        self.set(0)
-
-
-# ─── Janela principal ─────────────────────────────────────────────────────────
+# ─── Main window ─────────────────────────────────────────────────────────
 
 class F3App(tk.Tk):
     def __init__(self):
@@ -206,13 +187,13 @@ class F3App(tk.Tk):
 
         self._check_f3()
         self._build_ui()
-        # Deixa o tkinter calcular o tamanho ideal e centraliza
+        # Let tkinter calculate the ideal size and center
         self.update_idletasks()
         w = max(900, self.winfo_reqwidth())
         h = max(780, self.winfo_reqheight())
         self._center(w, h)
         self.minsize(w, h)
-        # Detecta dispositivos logo após a janela aparecer
+        # Detect devices right after window appears
         self.after(200, self._refresh_devices)
 
     def _center(self, w, h):
@@ -225,7 +206,7 @@ class F3App(tk.Tk):
         self._has_probe = shutil.which("f3probe")  is not None
         self._has_fix   = shutil.which("f3fix")    is not None
 
-    # ── Detecção de dispositivos ──────────────────────────────────────────────
+    # ── Device detection ──────────────────────────────────────────────
 
     @staticmethod
     def _list_devices():
@@ -275,14 +256,14 @@ class F3App(tk.Tk):
         devs = self._list_devices()
         self._devices_data = devs
         dev_labels = [self._fmt_device(d) for d in devs]
-        self._dev_combo["values"] = dev_labels or ["(nenhum dispositivo removível detectado)"]
+        self._dev_combo["values"] = dev_labels or ["(no removable devices detected)"]
         mounts = [d["mount"] for d in devs if d["mount"]]
-        self._mount_combo["values"] = mounts or ["(sem ponto de montagem detectado)"]
+        self._mount_combo["values"] = mounts or ["(no mount points detected)"]
         if dev_labels:
             self._dev_combo.current(0)
             self._on_dev_select()
         self._term.write(
-            f"  [{len(devs)} dispositivo(s) removível(is) detectado(s)]\n", "dim")
+            f"  [{len(devs)} removable device(s) detected]\n", "dim")
 
     def _on_dev_select(self, _event=None):
         idx = self._dev_combo.current()
@@ -297,7 +278,7 @@ class F3App(tk.Tk):
     # ── Layout ────────────────────────────────────────────────────────────────
 
     def _build_ui(self):
-        # Cabeçalho
+        # Header
         hdr = tk.Frame(self, bg=BG2, height=60)
         hdr.pack(fill="x")
         hdr.pack_propagate(False)
@@ -305,18 +286,18 @@ class F3App(tk.Tk):
                  font=(MONO, 22, "bold")).pack(side="left", padx=20)
         tk.Label(hdr, text="Fight Flash Fraud", bg=BG2, fg=TEXT,
                  font=(MONO, 13)).pack(side="left")
-        self._status_lbl = tk.Label(hdr, text="● PRONTO", bg=BG2, fg=SUCCESS,
+        self._status_lbl = tk.Label(hdr, text="● READY", bg=BG2, fg=SUCCESS,
                                     font=(MONO, 10, "bold"))
         self._status_lbl.pack(side="right", padx=20)
 
-        # Separador
+        # Separator
         tk.Frame(self, bg=ACCENT, height=2).pack(fill="x")
 
-        # Corpo
+        # Body
         body = tk.Frame(self, bg=BG)
         body.pack(fill="both", expand=True, padx=16, pady=12)
 
-        # Painel esquerdo — rolável para caber todos os controles
+        # Left panel — rolável para caber todos os controles
         left_outer = tk.Frame(body, bg=BG2, width=318)
         left_outer.pack(side="left", fill="y", padx=(0, 10))
         left_outer.pack_propagate(False)
@@ -354,7 +335,7 @@ class F3App(tk.Tk):
 
         self._build_controls(left)
 
-        # Painel direito (terminal + progresso)
+        # Right panel (terminal + progresso)
         right = tk.Frame(body, bg=BG)
         right.pack(side="left", fill="both", expand=True)
         self._build_output(right)
@@ -370,7 +351,7 @@ class F3App(tk.Tk):
     def _build_controls(self, parent):
         self._devices_data = []
 
-        # Estilo ttk para combobox escuro
+        # Dark combobox ttk style
         style = ttk.Style()
         style.theme_use("default")
         style.configure("Dark.TCombobox",
@@ -384,15 +365,15 @@ class F3App(tk.Tk):
                   fieldbackground=[("readonly", BG3)],
                   foreground=[("readonly", TEXT)])
 
-        tk.Label(parent, text="CONFIGURAÇÃO", bg=BG2, fg=TEXT_DIM,
+        tk.Label(parent, text="CONFIGURATION", bg=BG2, fg=TEXT_DIM,
                  font=(MONO, 8)).pack(anchor="w", padx=12, pady=(12,0))
 
-        # ── Seleção de dispositivo ────────────────────────────────────────────
-        self._section(parent, "Dispositivo removível")
+        # ── Device selection ────────────────────────────────────────────
+        self._section(parent, "Removable Device")
         df = tk.Frame(parent, bg=BG2)
         df.pack(fill="x", padx=12, pady=4)
 
-        tk.Label(df, text="Selecionar:", bg=BG2, fg=TEXT_DIM,
+        tk.Label(df, text="Select:", bg=BG2, fg=TEXT_DIM,
                  font=(MONO, 9)).pack(anchor="w")
         self._dev_combo = ttk.Combobox(df, state="readonly",
                                        style="Dark.TCombobox",
@@ -400,7 +381,7 @@ class F3App(tk.Tk):
         self._dev_combo.pack(fill="x", ipady=4)
         self._dev_combo.bind("<<ComboboxSelected>>", self._on_dev_select)
 
-        tk.Label(df, text="Caminho do dispositivo:", bg=BG2, fg=TEXT_DIM,
+        tk.Label(df, text="Device path:", bg=BG2, fg=TEXT_DIM,
                  font=(MONO, 9)).pack(anchor="w", pady=(6,0))
         self._dev_var = tk.StringVar()
         dev_entry = tk.Entry(df, textvariable=self._dev_var,
@@ -411,16 +392,16 @@ class F3App(tk.Tk):
                              highlightcolor=ACCENT)
         dev_entry.pack(fill="x", ipady=4)
 
-        FlatButton(df, "↺ Atualizar lista", command=self._refresh_devices,
+        FlatButton(df, "↺ Refresh list", command=self._refresh_devices,
                    color=BG3, text_color=ACCENT, height=28,
                    font_size=9).pack(anchor="e", pady=(5,0))
 
-        # ── Ponto de montagem ─────────────────────────────────────────────────
-        self._section(parent, "Ponto de Montagem (f3write / f3read)")
+        # ── Mount point ─────────────────────────────────────────────────
+        self._section(parent, "Mount Point (f3write / f3read)")
         mf = tk.Frame(parent, bg=BG2)
         mf.pack(fill="x", padx=12, pady=4)
 
-        tk.Label(mf, text="Partições montadas:", bg=BG2, fg=TEXT_DIM,
+        tk.Label(mf, text="Mounted partitions:", bg=BG2, fg=TEXT_DIM,
                  font=(MONO, 9)).pack(anchor="w")
         self._mount_combo = ttk.Combobox(mf, state="readonly",
                                          style="Dark.TCombobox",
@@ -430,7 +411,7 @@ class F3App(tk.Tk):
                                lambda e: self._mount_var.set(
                                    self._mount_combo.get()))
 
-        tk.Label(mf, text="Caminho manual / confirmar:", bg=BG2, fg=TEXT_DIM,
+        tk.Label(mf, text="Manual path / confirm:", bg=BG2, fg=TEXT_DIM,
                  font=(MONO, 9)).pack(anchor="w", pady=(6,0))
         self._mount_var = tk.StringVar()
         tk.Entry(mf, textvariable=self._mount_var,
@@ -440,16 +421,16 @@ class F3App(tk.Tk):
                  highlightbackground=BORDER,
                  highlightcolor=ACCENT).pack(fill="x", ipady=4)
 
-        FlatButton(mf, "📂 Procurar", command=self._browse_mount,
+        FlatButton(mf, "📂 Browse", command=self._browse_mount,
                    color=BG3, text_color=TEXT, height=28,
                    font_size=9).pack(anchor="e", pady=(5,0))
 
-        # ── Opções ───────────────────────────────────────────────────────────
-        self._section(parent, "Opções")
+        # ── Options ───────────────────────────────────────────────────────────
+        self._section(parent, "Options")
         of = tk.Frame(parent, bg=BG2)
         of.pack(fill="x", padx=12, pady=4)
 
-        # Campo --last-sec (preenchido automaticamente pelo f3probe)
+        # --last-sec field (preenchido automaticamente pelo f3probe)
         ls_row = tk.Frame(of, bg=BG2)
         ls_row.pack(fill="x", pady=(6, 0))
         tk.Label(ls_row, text="--last-sec =", bg=BG2, fg=TEXT_DIM,
@@ -462,27 +443,12 @@ class F3App(tk.Tk):
                             highlightbackground=BORDER,
                             highlightcolor=ACCENT)
         ls_entry.pack(side="left", padx=(4, 0), ipady=3)
-        self._last_sec_lbl = tk.Label(of, text="Rode f3probe primeiro ⮭",
+        self._last_sec_lbl = tk.Label(of, text="Run f3probe first ⮭",
                                       bg=BG2, fg=TEXT_DIM, font=(MONO, 8))
         self._last_sec_lbl.pack(anchor="w", pady=(2, 0))
 
-        # Label FAT32 (usado após f3fix)
-        tk.Frame(of, bg=BORDER, height=1).pack(fill="x", pady=(8, 0))
-        lf_row = tk.Frame(of, bg=BG2)
-        lf_row.pack(fill="x", pady=(6, 0))
-        tk.Label(lf_row, text="Label FAT32:", bg=BG2, fg=TEXT_DIM,
-                 font=(MONO, 9)).pack(side="left")
-        self._fat_label_var = tk.StringVar(value="PENDRIVE")
-        tk.Entry(lf_row, textvariable=self._fat_label_var,
-                 bg=BG3, fg=ACCENT, insertbackground=ACCENT,
-                 relief="flat", font=(MONO, 9, "bold"), width=12,
-                 highlightthickness=1, highlightbackground=BORDER,
-                 highlightcolor=ACCENT).pack(side="left", padx=(4, 0), ipady=3)
-        tk.Label(of, text="Usado ao formatar após f3fix",
-                 bg=BG2, fg=TEXT_DIM, font=(MONO, 8)).pack(anchor="w", pady=(2, 0))
-
-        # Botões de ação
-        self._section(parent, "Ações")
+        # Action buttons
+        self._section(parent, "Actions")
         bf = tk.Frame(parent, bg=BG2)
         bf.pack(fill="x", padx=12, pady=6)
 
@@ -504,37 +470,37 @@ class F3App(tk.Tk):
 
         tk.Frame(parent, bg=BORDER, height=1).pack(fill="x", padx=12, pady=8)
 
-        self._btn_stop = FlatButton(parent, "■ PARAR", command=self._stop,
+        self._btn_stop = FlatButton(parent, "■ STOP", command=self._stop,
                                     color=ERROR, width=130, height=34,
                                     font_size=10)
         self._btn_stop.pack(padx=12, pady=2, fill="x")
         self._btn_stop.set_enabled(False)
 
-        FlatButton(parent, "🗑 Limpar saída", command=self._clear,
+        FlatButton(parent, "🗑 Clear output", command=self._clear,
                    color=BG3, text_color=TEXT_DIM, width=130, height=30,
                    font_size=9).pack(padx=12, pady=(4,0), fill="x")
 
-        # Aviso de ferramentas ausentes
+        # Missing tools warning
         missing = []
         for t, has in [("f3write", self._has_write), ("f3read", self._has_read),
                        ("f3probe", self._has_probe), ("f3fix", self._has_fix)]:
             if not has:
                 missing.append(t)
         if missing:
-            tk.Label(parent, text=f"⚠ Não encontrado:\n{', '.join(missing)}",
+            tk.Label(parent, text=f"⚠ Not found:\n{', '.join(missing)}",
                      bg=BG2, fg=WARN, font=(MONO, 8), justify="left",
                      wraplength=270).pack(padx=12, pady=8, anchor="w")
 
     def _build_output(self, parent):
         # Terminal
-        tk.Label(parent, text="SAÍDA", bg=BG, fg=TEXT_DIM,
+        tk.Label(parent, text="OUTPUT", bg=BG, fg=TEXT_DIM,
                  font=(MONO, 8)).pack(anchor="w")
         self._term = Terminal(parent)
         self._term.pack(fill="both", expand=True)
 
-        # Banner de veredito (oculto até ter resultado)
+        # Verdict banner (oculto até ter resultado)
         self._verdict_frame = tk.Frame(parent, bg=BG)
-        # Não empacota aqui — _show_verdict faz o pack quando necessário
+        # Not packed here — _show_verdict faz o pack quando necessário
 
         self._verdict_icon  = tk.Label(self._verdict_frame, font=(MONO, 26),
                                        bg=BG)
@@ -552,22 +518,31 @@ class F3App(tk.Tk):
                                         justify="left")
         self._verdict_detail.pack(fill="x", pady=(2, 0))
 
-        # Barra inferior
+        # Bottom bar
         bot = tk.Frame(parent, bg=BG2)
         bot.pack(fill="x", pady=(6,0))
-        self._info_lbl = tk.Label(bot, text="Selecione uma ação para começar.",
+        self._info_lbl = tk.Label(bot, text="Select an action to begin.",
                                   bg=BG2, fg=TEXT_DIM, font=(MONO, 9),
                                   anchor="w")
         self._info_lbl.pack(side="left", padx=8, pady=4)
 
-    # ── Navegação ─────────────────────────────────────────────────────────────
+        gh = tk.Label(bot, text="⌥ github.com/dantavares/f3-gui",
+                      bg=BG2, fg=TEXT_DIM, font=(MONO, 8),
+                      cursor="hand2", anchor="e")
+        gh.pack(side="right", padx=8, pady=4)
+        gh.bind("<Enter>", lambda _: gh.config(fg=ACCENT))
+        gh.bind("<Leave>", lambda _: gh.config(fg=TEXT_DIM))
+        gh.bind("<Button-1>", lambda _: __import__("webbrowser").open(
+            "https://github.com/dantavares/f3-gui"))
+
+    # ── Navigation ─────────────────────────────────────────────────────────────
 
     def _browse_mount(self):
-        path = filedialog.askdirectory(title="Selecionar ponto de montagem")
+        path = filedialog.askdirectory(title="Select mount point")
         if path:
             self._mount_var.set(path)
 
-    # ── Controle de estado ────────────────────────────────────────────────────
+    # ── State control ────────────────────────────────────────────────────
 
     def _set_running(self, running):
         self._running = running
@@ -577,7 +552,7 @@ class F3App(tk.Tk):
             btn.set_enabled(state)
         self._btn_stop.set_enabled(running)
         self._status_lbl.config(
-            text="● EXECUTANDO" if running else "● PRONTO",
+            text="● RUNNING" if running else "● READY",
             fg=WARN if running else SUCCESS
         )
 
@@ -587,14 +562,14 @@ class F3App(tk.Tk):
                 self._process.terminate()
             except Exception:
                 pass
-        self._term.write("\n[Processo interrompido pelo usuário]\n", "warn")
+        self._term.write("\n[Process interrupted by user]\n", "warn")
         self._set_running(False)
 
     def _clear(self):
         self._term.clear()
         self._hide_verdict()
 
-    # ── Veredito ──────────────────────────────────────────────────────────────
+    # ── Verdict ──────────────────────────────────────────────────────────────
 
     def _hide_verdict(self):
         self._verdict_frame.pack_forget()
@@ -676,66 +651,77 @@ class F3App(tk.Tk):
         dev = self._dev_var.get().strip() or "o dispositivo"
 
         if genuine:
-            title  = f"🎉  Parabéns! {dev} é GENUÍNO."
+            title  = f"🎉  Congratulations! {dev} is GENUINE."
             parts  = []
             if ok_str:
-                parts.append(f"Dados OK: {ok_str}")
+                parts.append(f"Data OK: {ok_str}")
             if lost_str:
-                parts.append(f"Dados perdidos: {lost_str}")
+                parts.append(f"Data lost: {lost_str}")
             if probe_msg:
                 parts.append(probe_msg)
             detail = "  |  ".join(parts) if parts else \
-                     "O dispositivo passou na verificação com sucesso."
+                     "The device passed verification successfully."
             self.after(0, lambda: self._show_verdict(True, title, detail, SUCCESS))
         else:
-            title = f"⛔  ATENÇÃO! {dev} tem TAMANHO FALSO."
+            title = f"⛔  WARNING! {dev} has a FAKE CAPACITY."
             parts = []
             if lost_str:
-                parts.append(f"Dados corrompidos / inacessíveis: {lost_str}")
+                parts.append(f"Corrupted / inaccessible data: {lost_str}")
             if ok_str:
-                parts.append(f"Dados OK (capacidade real): {ok_str}")
+                parts.append(f"Data OK (real capacity): {ok_str}")
             if probe_msg:
                 parts.append(probe_msg)
             parts.append(
-                "Sugestão: execute o f3probe para detectar a capacidade real, "
-                "depois use o f3fix para corrigir a tabela de partições."
+                "Suggestion: run f3probe to detect the real capacity, "
+                "then use f3fix to fix the partition table."
             )
             detail = "\n".join(parts)
             self.after(0, lambda: self._show_verdict(False, title, detail, ERROR))
 
-    # ── Execução de comandos ──────────────────────────────────────────────────
+    # ── Command execution ──────────────────────────────────────────────────
 
     @staticmethod
     def _iter_lines(fd):
         """
-        Lê do PTY em chunks e separa:
-        - \\r\\n → linha normal  (sep='LF')
-        - \\r sozinho → progresso (sep='CR')
-        O PTY converte \\n do processo em \\r\\n, então linhas normais
-        chegam como \\r\\n e linhas de progresso como \\r sem \\n seguinte.
+        Lê do PTY (modo raw) e separa linhas corretamente:
+          \\r\\n  →  linha normal  ('LF')
+          \\n     →  linha normal  ('LF')   ← em raw mode, \n não vira \r\n
+          \\r     →  linha progresso ('CR')
+
+        O bug anterior: split por '\\r\\n' não capturava '\\n' puro,
+        então o buffer acumulava tudo e entregava como uma linha gigante.
         """
         import os
-        buf = ""
+        buf = []
         while True:
             try:
-                chunk = os.read(fd, 512).decode("utf-8", errors="replace")
+                data = os.read(fd, 256).decode("utf-8", errors="replace")
             except OSError:
                 break
-            if not chunk:
+            if not data:
                 break
-            buf += chunk
-            # Processa \r\n primeiro (linhas completas)
-            while "\r\n" in buf:
-                line, buf = buf.split("\r\n", 1)
-                yield line, "LF"
-            # Processa \r sozinhos (linhas de progresso)
-            # Guarda o último segmento no buffer (pode estar incompleto)
-            parts = buf.split("\r")
-            for part in parts[:-1]:
-                yield part, "CR"
-            buf = parts[-1]
+            i = 0
+            while i < len(data):
+                ch = data[i]
+                if ch == "\r":
+                    # Verifica se é \r\n
+                    if i + 1 < len(data) and data[i + 1] == "\n":
+                        yield "".join(buf), "LF"
+                        buf = []
+                        i += 2
+                    else:
+                        yield "".join(buf), "CR"
+                        buf = []
+                        i += 1
+                elif ch == "\n":
+                    yield "".join(buf), "LF"
+                    buf = []
+                    i += 1
+                else:
+                    buf.append(ch)
+                    i += 1
         if buf:
-            yield buf, "LF"
+            yield "".join(buf), "LF"
 
     def _run_cmd(self, cmd, title, parse_fn=None, show_verdict=False,
                  on_success=None):
@@ -746,7 +732,7 @@ class F3App(tk.Tk):
         self._term.header(title)
         self._term.timestamp()
         self._term.write(f"  $ {' '.join(cmd)}\n\n", "blue")
-        self._info_lbl.config(text=f"Executando: {cmd[0]} …")
+        self._info_lbl.config(text=f"Running: {cmd[0]} …")
         collected = []
 
         def worker():
@@ -764,55 +750,55 @@ class F3App(tk.Tk):
                 os.close(slave_fd)
 
                 for line, sep in self._iter_lines(master_fd):
-                    is_cr = (sep == "CR")
+                    # Call parse_fn on every line: captures last-sec etc.
                     if parse_fn:
                         parse_fn(line)
-                    if is_cr:
+                    if sep == "CR":
                         self.after(0, lambda l=line: self._info_lbl.config(
                             text=l.strip()))
                     else:
                         collected.append(line)
-                        self._handle_line(line + "\n", None, None)
+                        self._handle_line(line + "\n")
 
                 os.close(master_fd)
                 self._process.wait()
                 rc = self._process.returncode
                 if rc == 0:
                     self.after(0, lambda: self._term.write(
-                        "\n✔ Concluído com sucesso.\n", "success"))
+                        "\n✔ Completed successfully.\n", "success"))
                     if on_success:
                         self.after(0, on_success)
                 else:
                     self.after(0, lambda: self._term.write(
-                        f"\n✘ Processo encerrado (código {rc}).\n", "error"))
+                        f"\n✘ Process exited (code {rc}).\n", "error"))
                 if show_verdict:
                     self._show_result_verdict(collected, cmd[0])
             except FileNotFoundError:
                 self.after(0, lambda: self._term.write(
-                    f"\n✘ Comando não encontrado: {cmd[0]}\n"
-                    "  Instale o f3: https://github.com/AltraMayor/f3\n",
+                    f"\n✘ Command not found: {cmd[0]}\n"
+                    "  Install f3: https://github.com/AltraMayor/f3\n",
                     "error"))
             except Exception as e:
                 self.after(0, lambda: self._term.write(
-                    f"\n✘ Erro: {e}\n", "error"))
+                    f"\n✘ Error: {e}\n", "error"))
             finally:
                 self.after(0, lambda: self._set_running(False))
-                self.after(0, lambda: self._info_lbl.config(text="Pronto."))
+                self.after(0, lambda: self._info_lbl.config(text="Done."))
 
         threading.Thread(target=worker, daemon=True).start()
 
-    def _handle_line(self, line, *_):
+    def _handle_line(self, line):
         tag = ""
         l = line.lower()
-        if any(w in l for w in ("error", "erro", "failed", "falha")):
+        if any(w in l for w in ("error", "error", "failed", "failure")):
             tag = "error"
         elif any(w in l for w in ("ok", "success", "good", "pass")):
             tag = "success"
-        elif any(w in l for w in ("warn", "aviso", "caution")):
+        elif any(w in l for w in ("warn", "warning", "caution")):
             tag = "warn"
         self.after(0, lambda ln=line, t=tag: self._term.write(ln, t))
 
-    # ── Parsers de progresso ──────────────────────────────────────────────────
+    # ── Progress parsers ──────────────────────────────────────────────────
 
     @staticmethod
     def _parse_write(line):
@@ -843,150 +829,153 @@ class F3App(tk.Tk):
     def _set_last_sec(self, val):
         self._last_sec_var.set(val)
         self._last_sec_lbl.config(
-            text="  ✔ capturado do f3probe", fg=SUCCESS)
+            text="  ✔ captured from f3probe", fg=SUCCESS)
         self._term.write(
-            f"  → --last-sec={val} capturado e pronto para f3fix\n", "success")
+            f"  → --last-sec={val} captured and ready for f3fix\n", "success")
 
-    # ── Ações ─────────────────────────────────────────────────────────────────
+    # ── Actions ─────────────────────────────────────────────────────────────────
 
     def _run_write(self):
         mount = self._mount_var.get().strip()
         if not mount:
-            messagebox.showwarning("Atenção", "Informe o ponto de montagem.")
+            messagebox.showwarning("Warning", "Please enter the mount point.")
             return
         if not os.path.isdir(mount):
-            if not messagebox.askyesno("Caminho não encontrado",
-                                       f"'{mount}' não existe. Continuar mesmo assim?"):
+            if not messagebox.askyesno("Path not found",
+                                       f"'{mount}' does not exist. Continue anyway?"):
                 return
         self._run_cmd(["f3write", mount],
-                      "f3write — Gravando dados de teste")
+                      "f3write — Writing test data",
+                      parse_fn=self._parse_write)
 
     def _run_read(self):
         mount = self._mount_var.get().strip()
         if not mount:
-            messagebox.showwarning("Atenção", "Informe o ponto de montagem.")
+            messagebox.showwarning("Warning", "Please enter the mount point.")
             return
         self._run_cmd(["f3read", mount],
-                      "f3read — Verificando integridade",
+                      "f3read — Verifying integrity",
+                      parse_fn=self._parse_read,
                       show_verdict=True)
 
     def _run_probe(self):
         device = self._dev_var.get().strip()
         if not device:
-            messagebox.showwarning("Atenção", "Selecione ou informe o dispositivo.")
+            messagebox.showwarning("Warning", "Please select or enter the device.")
             return
         if not messagebox.askyesno(
-            "Confirmar f3probe",
-            f"f3probe irá APAGAR DADOS em {device}.\n"
-            "Tem certeza que deseja continuar?"
+            "Confirm f3probe",
+            f"f3probe will ERASE DATA on {device}.\n"
+            "After probing, the device will be formatted as FAT32 and mounted.\n\n"
+            "Are you sure you want to continue?"
         ):
             return
         self._last_sec_var.set("")
-        self._last_sec_lbl.config(text="Rode f3probe primeiro ⮭", fg=TEXT_DIM)
-        cmd = self._privileged_cmd(["f3probe", "--destructive", device])
-        self._run_cmd(cmd, f"f3probe — Sondando {device}",
+        self._last_sec_lbl.config(text="Run f3probe first ⮭", fg=TEXT_DIM)
+        part = self._first_partition(device)
+        # Single pkexec call: unmount + probe + format in one script (no second auth prompt)
+        cmd = self._privileged_cmd_script([
+            f"umount {device}* 2>/dev/null || true",
+            f"f3probe --destructive {device}",
+            "sleep 2",
+            f"mkfs.fat -F 32 {part}",
+        ])
+        self._run_cmd(cmd, f"f3probe + format — {device}",
                       parse_fn=self._parse_probe_line,
-                      show_verdict=True)
+                      show_verdict=True,
+                      on_success=lambda: self._do_mount(part))
 
     def _run_fix(self):
         device = self._dev_var.get().strip()
         if not device:
-            messagebox.showwarning("Atenção", "Selecione ou informe o dispositivo.")
+            messagebox.showwarning("Warning", "Please select or enter the device.")
             return
         last_sec = self._last_sec_var.get().strip()
         if not last_sec:
             messagebox.showwarning(
-                "--last-sec ausente",
-                "O f3fix exige o parâmetro --last-sec.\n\n"
-                "Execute o f3probe primeiro — o valor será\n"
-                "capturado automaticamente da saída.")
+                "--last-sec missing",
+                "f3fix requires the --last-sec parameter.\n\n"
+                "Run f3probe first — the value will be\n"
+                "captured automatically from the output.")
             return
         if not last_sec.isdigit():
-            messagebox.showerror("Valor inválido",
-                                 f"--last-sec deve ser um número inteiro.\nValor atual: '{last_sec}'")
+            messagebox.showerror("Invalid value",
+                                 f"--last-sec must be an integer.\nCurrent value: '{last_sec}'")
             return
-        label = self._fat_label_var.get().strip().upper() or "PENDRIVE"
-        # Limita a 11 chars (limite FAT32) e remove chars inválidos
-        label = re.sub(r'[^A-Z0-9_\- ]', '', label)[:11]
-
         if not messagebox.askyesno(
-            "Confirmar f3fix + Formatar",
-            f"Sequência completa para {device}:\n\n"
+            "Confirm f3fix + Format",
+            f"Full sequence for {device}:\n\n"
             f"  1. f3fix  --last-sec={last_sec}\n"
-            f"  2. mkfs.fat -F 32  (label: {label})\n"
-            f"  3. Montar automaticamente\n\n"
-            "Os dados existentes serão APAGADOS. Continuar?"
+            f"  2. Format as FAT32\n"
+            f"  3. Mount automatically\n\n"
+            "Existing data will be ERASED. Continue?"
         ):
             return
-
-        # Detecta a primeira partição do dispositivo (ex: /dev/sdb → /dev/sdb1)
-        # f3fix recria a tabela de partições com uma partição sdb1
         part = self._first_partition(device)
-
-        cmd = self._privileged_cmd(["f3fix", f"--last-sec={last_sec}", device])
+        # Single pkexec call: unmount + fix + format in one script (no second auth prompt)
+        cmd = self._privileged_cmd_script([
+            f"umount {device}* 2>/dev/null || true",
+            f"f3fix --last-sec={last_sec} {device}",
+            "sleep 2",
+            f"mkfs.fat -F 32 {part}",
+        ])
         self._run_cmd(
             cmd,
-            f"f3fix — Corrigindo {device}  (--last-sec={last_sec})",
-            on_success=lambda: self._do_format(part, label)
+            f"f3fix + format — {device}  (--last-sec={last_sec})",
+            on_success=lambda: self._do_mount(part)
         )
 
     @staticmethod
     def _first_partition(device):
-        """
-        Deriva a primeira partição a partir do dispositivo.
-        /dev/sdb  → /dev/sdb1
-        /dev/mmcblk0 → /dev/mmcblk0p1
+        """Derive the first partition from the device path.
+        /dev/sdb  → /dev/sdb1  |  /dev/mmcblk0 → /dev/mmcblk0p1
         """
         import re as _re
         if _re.search(r'\d$', device):
-            # Dispositivo já termina em dígito (ex: mmcblk0) → adiciona 'p1'
             return device + "p1"
         return device + "1"
 
-    def _do_format(self, partition, label):
-        """Formata a partição como FAT32 e em seguida monta."""
-        self._term.write(f"\n  Aguardando o kernel reconhecer {partition}…\n", "dim")
-
-        def after_settle():
-            # Pequena pausa para o kernel atualizar /dev após f3fix
+    def _privileged_cmd_script(self, commands):
+        """
+        Write a temporary shell script with the given commands and wrap it
+        in a single pkexec/sudo call — so the user authenticates only once
+        for the entire sequence.
+        """
+        import tempfile, stat
+        script_body = "#!/bin/sh\nset -e\n" + "\n".join(commands) + "\n"
+        tmp = tempfile.NamedTemporaryFile(
+            mode='w', suffix='.sh', delete=False, prefix='f3gui_')
+        tmp.write(script_body)
+        tmp.flush()
+        tmp.close()
+        os.chmod(tmp.name, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP |
+                            stat.S_IROTH | stat.S_IXOTH)
+        # Clean up the temp file after a delay (process will have started by then)
+        def _cleanup():
             import time
-            time.sleep(2)
-            self.after(0, lambda: self._run_mkfs(partition, label))
-
-        threading.Thread(target=after_settle, daemon=True).start()
-
-    def _run_mkfs(self, partition, label):
-        """Executa mkfs.fat -F 32 na partição."""
-        cmd = self._privileged_cmd(
-            ["mkfs.fat", "-F", "32", "-n", label, partition]
-        )
-        self._run_cmd(
-            cmd,
-            f"mkfs.fat — Formatando {partition} como FAT32  (label: {label})",
-            on_success=lambda: self._do_mount(partition)
-        )
+            time.sleep(30)
+            try:
+                os.unlink(tmp.name)
+            except OSError:
+                pass
+        threading.Thread(target=_cleanup, daemon=True).start()
+        return self._privileged_cmd(["sh", tmp.name])
 
     def _do_mount(self, partition):
-        """Monta a partição via udisksctl (sem root) ou mount (com root)."""
-        # udisksctl é preferível: não precisa de root e cria o mountpoint
+        """Mount via udisksctl (no root) or mount (privileged fallback)."""
         if shutil.which("udisksctl"):
             cmd = ["udisksctl", "mount", "-b", partition]
-            title = f"udisksctl — Montando {partition}"
+            title = f"udisksctl — Mounting {partition}"
         else:
-            # Fallback: cria /media/f3gui e monta com pkexec
-            mount_pt = f"/media/f3gui"
+            mount_pt = "/media/f3gui"
             os.makedirs(mount_pt, exist_ok=True)
             cmd = self._privileged_cmd(["mount", partition, mount_pt])
-            title = f"mount — Montando {partition} em {mount_pt}"
-
+            title = f"mount — Mounting {partition} at {mount_pt}"
         self._run_cmd(cmd, title,
                       on_success=lambda: self._after_mount(partition))
 
     def _after_mount(self, partition):
-        """Atualiza o terminal e o dropdown de montagem após montar com sucesso."""
-        self._term.write(
-            f"\n✔ {partition} montado com sucesso.\n", "success")
-        # Atualiza a lista de dispositivos para refletir o novo ponto de montagem
+        self._term.write(f"\n✔ {partition} mounted successfully.\n", "success")
         self._refresh_devices()
 
     @staticmethod
