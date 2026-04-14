@@ -130,15 +130,47 @@ class Terminal(tk.Frame):
                             insertbackground=ACCENT, wrap="none",
                             highlightthickness=1, highlightbackground=BORDER,
                             padx=8, pady=6)
-        sb_y = tk.Scrollbar(self, orient="vertical",
-                             command=self.text.yview, bg=BG3)
-        sb_x = tk.Scrollbar(self, orient="horizontal",
-                             command=self.text.xview, bg=BG3)
-        self.text.configure(yscrollcommand=sb_y.set,
-                            xscrollcommand=sb_x.set)
-        sb_y.pack(side="right", fill="y")
-        sb_x.pack(side="bottom", fill="x")
+
+        self._sb_y = tk.Scrollbar(self, orient="vertical",
+                                   command=self.text.yview, bg=BG3)
+        self._sb_x = tk.Scrollbar(self, orient="horizontal",
+                                   command=self.text.xview, bg=BG3)
+
+        self.text.configure(
+            yscrollcommand=self._auto_y,
+            xscrollcommand=self._auto_x,
+        )
+
+        # Layout: pack scrollbars first so they reserve space correctly
+        self._sb_x.pack(side="bottom", fill="x")
+        self._sb_x.pack_forget()           # hidden by default
+        self._sb_y.pack(side="right", fill="y")
+        self._sb_y.pack_forget()           # hidden by default
         self.text.pack(fill="both", expand=True)
+
+        # Color tags
+        self.text.tag_config("accent",  foreground=ACCENT)
+        self.text.tag_config("success", foreground=SUCCESS)
+        self.text.tag_config("warn",    foreground=WARN)
+        self.text.tag_config("error",   foreground=ERROR)
+        self.text.tag_config("dim",     foreground=TEXT_DIM)
+        self.text.tag_config("blue",    foreground=ACCENT2)
+
+    def _auto_y(self, first, last):
+        """Show vertical scrollbar only when content overflows."""
+        if float(first) <= 0.0 and float(last) >= 1.0:
+            self._sb_y.pack_forget()
+        else:
+            self._sb_y.pack(side="right", fill="y", before=self.text)
+        self._sb_y.set(first, last)
+
+    def _auto_x(self, first, last):
+        """Show horizontal scrollbar only when content overflows."""
+        if float(first) <= 0.0 and float(last) >= 1.0:
+            self._sb_x.pack_forget()
+        else:
+            self._sb_x.pack(side="bottom", fill="x", before=self.text)
+        self._sb_x.set(first, last)
 
         # Color tags
         self.text.tag_config("accent",  foreground=ACCENT)
@@ -754,8 +786,10 @@ class F3App(tk.Tk):
                     if parse_fn:
                         parse_fn(line)
                     if sep == "CR":
-                        self.after(0, lambda l=line: self._info_lbl.config(
-                            text=l.strip()))
+                        cleaned = self._clean(line).strip()
+                        if cleaned:
+                            self.after(0, lambda l=cleaned: self._info_lbl.config(
+                                text=l))
                     else:
                         collected.append(line)
                         self._handle_line(line + "\n")
@@ -787,10 +821,23 @@ class F3App(tk.Tk):
 
         threading.Thread(target=worker, daemon=True).start()
 
+    # Strip ANSI escape sequences and stray control characters from PTY output
+    _ANSI_RE = re.compile(
+        r'\x1b(?:\[[0-9;?]*[A-Za-z]|\([AB012]|[=>A-Z])'
+        r'|[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]'
+    )
+
+    @classmethod
+    def _clean(cls, text):
+        return cls._ANSI_RE.sub('', text)
+
     def _handle_line(self, line):
+        line = self._clean(line)
+        if not line.strip('\n'):
+            return
         tag = ""
         l = line.lower()
-        if any(w in l for w in ("error", "error", "failed", "failure")):
+        if any(w in l for w in ("error", "failed", "failure")):
             tag = "error"
         elif any(w in l for w in ("ok", "success", "good", "pass")):
             tag = "success"
