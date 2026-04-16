@@ -680,10 +680,10 @@ class F3App(tk.Tk):
         if genuine is None:
             return  # Sem dados suficientes para veredito
 
-        dev = self._dev_var.get().strip() or "o dispositivo"
+        dev = self._dev_var.get().strip() or "the device"
 
         if genuine:
-            title  = f"🎉  Congratulations! {dev} is GENUINE."
+            title  = f"✅  Congratulations! {dev} is PASSED ON TEST!."
             parts  = []
             if ok_str:
                 parts.append(f"Data OK: {ok_str}")
@@ -695,7 +695,7 @@ class F3App(tk.Tk):
                      "The device passed verification successfully."
             self.after(0, lambda: self._show_verdict(True, title, detail, SUCCESS))
         else:
-            title = f"⛔  WARNING! {dev} has a FAKE CAPACITY."
+            title = f"⛔  WARNING! {dev} has a FAIL ON TEST!"
             parts = []
             if lost_str:
                 parts.append(f"Corrupted / inaccessible data: {lost_str}")
@@ -704,7 +704,8 @@ class F3App(tk.Tk):
             if probe_msg:
                 parts.append(probe_msg)
             parts.append(
-                "Suggestion: run f3probe to detect the real capacity, "
+                "If you suspect this is a fake device "
+                "run f3probe to detect the real capacity, "
                 "then use f3fix to fix the partition table."
             )
             detail = "\n".join(parts)
